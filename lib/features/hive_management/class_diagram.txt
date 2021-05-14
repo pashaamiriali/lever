@@ -1,0 +1,39 @@
+Hive
+-Number: number
+-Picture: string
+-AnnualHoney: number
+-Description: string
+-PopulationInfo: PopulationInfo
+-QueenInfo: QueenInfo
+-Visits[]: Visit[]
+
+QueenInfo {many_to_one Hive, one_to_one ChangeQueen}
+-EnterDate: date
+-Breed: string
+-BackColor: string
+
+PopulationInfo {many_to_one Hive, one_to_one RegularVisit}
+-Frames: number
+-Stairs: number
+-Status: string
+
+Visit {many_to_one Hive}
+-Date: date
+-Picture: string
+-Description: string
+
+RegularVisit {inherits Visit}
+-Behavior: string
+-QueenSeen: boolean
+-HoneyMaking: string
+-PopulationInfo: PopulationInfo
+
+ChangeQueen {inherits Visit}
+-QueenInfo: QueenInfo
+
+HarvestHoney {inherits Visit}
+-DescribedAmmount: string
+-Frames: number
+-Weight: number
+-Quality: string
+    

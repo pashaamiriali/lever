@@ -1,0 +1,11 @@
+BarnItem
+-Name: string
+-Unit: string
+-Available: number
+-AddToItems[]: AddToItem
+-RemoveFromItems[]: RemoveFromItem
+
+Transaction many_to_one BarnItem
+-Date: date
+-Amount: number
+-Type: string(add/remove)

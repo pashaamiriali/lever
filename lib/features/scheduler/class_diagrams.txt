@@ -1,0 +1,7 @@
+Reminder
+-Title: string
+-Description: string
+-DueDate: date
+-DueTime: time
+-Urgency: string
+-Expired: boolean
