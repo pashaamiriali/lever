@@ -5,6 +5,7 @@ Hive
 -Description: string
 -PopulationInfo: PopulationInfo
 -QueenInfo: QueenInfo
+-Pictures: list<string>
 -Visits[]: Visit[]
 
 QueenInfo {many_to_one Hive, one_to_one ChangeQueen}
