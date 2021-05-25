@@ -1,7 +1,10 @@
-
 import 'queen_info.dart';
 import 'visit.dart';
 
 class ChangeQueen extends Visit {
-  QueenInfo queenInfo;
+  final QueenInfo queenInfo;
+
+  ChangeQueen(String id, DateTime date, List<String> pictures,
+      String description, this.queenInfo)
+      : super(id, date, pictures, description);
 }

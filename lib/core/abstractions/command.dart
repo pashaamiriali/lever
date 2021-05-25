@@ -1,3 +1,3 @@
 abstract class Command {
-  execute(List args);
+  execute(Map<String,dynamic> args);
 }
