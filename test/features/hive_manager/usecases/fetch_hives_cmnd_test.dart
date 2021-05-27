@@ -16,7 +16,7 @@ void main() {
           1234,
           44,
           'test',
-          [],
+          '',
           PopulationInfo('223f', 'rv2153425', 20, 2, 'OK'),
           QueenInfo(
             '32234f',

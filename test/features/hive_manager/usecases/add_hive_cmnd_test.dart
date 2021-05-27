@@ -21,7 +21,7 @@ main() {
         1234,
         23,
         'desc',
-        ['empty'],
+        'empty',
         PopulationInfo('id', 'regularVisitId', 20, 2, 'good'),
         QueenInfo(
           'id',
@@ -48,7 +48,7 @@ main() {
   );
   test('should call saveHive in hiveRepo with proper arguments', () {
     var addHiveCommand = AddHiveCmnd(mockHiveRepo);
-    Hive hive = Hive(null, 1234, 23, 'desc', ['empty'], null, null, null);
+    Hive hive = Hive(null, 1234, 23, 'desc', 'empty', null, null, null);
     var populationInfo = PopulationInfo('id', 'regularVisitId', 20, 2, 'good');
     var queenInfo = QueenInfo(
       'id',
@@ -68,17 +68,17 @@ main() {
       'should return a hive with uniqueId + a populationInfo and queenInfo with visit ids',
       () async {
     var addHiveCommand = AddHiveCmnd(mockHiveRepo);
-    Hive hive = Hive(null, 1234, 23, 'desc', ['empty'], null, null, null);
-    var populationInfo = PopulationInfo('id', 'regularVisitId', 20, 2, 'good');
+    Hive hive = Hive(null, 1234, 23, 'desc', 'empty', null, null, null);
+    var populationInfo = PopulationInfo(null, 'regularVisitId', 20, 2, 'good');
     var queenInfo = QueenInfo(
-      'id',
+      null,
       'changeQueenId',
       DateTime.now(),
       'breed',
       'black',
     );
     var expectedHive = Hive(
-        null, 1234, 23, 'desc', ['empty'], populationInfo, queenInfo, null);
+        null, 1234, 23, 'desc', 'empty', populationInfo, queenInfo, null);
     when(mockHiveRepo.saveHive(hive, populationInfo, queenInfo))
         .thenAnswer((realInvocation) => expectedHive);
     var result = await addHiveCommand.execute({

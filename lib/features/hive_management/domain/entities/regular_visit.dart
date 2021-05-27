@@ -9,6 +9,7 @@ class RegularVisit extends Visit {
 
   RegularVisit(
       String id,
+      String hiveId,
       DateTime date,
       List<String> pictures,
       String description,
@@ -16,5 +17,5 @@ class RegularVisit extends Visit {
       this.queenSeen,
       this.honeyMaking,
       this.populationInfo)
-      : super(id, date, pictures, description);
+      : super(id, hiveId,date, pictures, description);
 }
