@@ -23,7 +23,155 @@ class HiveRepoImpl extends HiveRepo {
   @override
   Future<Hive> saveHive(
       Hive hive, PopulationInfo populationInfo, QueenInfo queenInfo) async {
-    //TODO: refactor to smaller functions
+    var hiveId = insertHive(hive);
+    var regularVisitId = this._idGen.generateId();
+    var regularVisitMap = insertRegularVisit(hiveId, regularVisitId);
+    Map<String, Map<String, dynamic>> populationInfoMap =
+        insertPopulationInfo(regularVisitId, populationInfo);
+    var changeQueenId = this._idGen.generateId();
+    Map<String, Map<String, dynamic>> changeQueenMap =
+        insertChangeQueen(changeQueenId, hiveId);
+    Map<String, Map<String, dynamic>> queenInfoMap =
+        insertQueenInfo(changeQueenId, queenInfo);
+
+    return generateReturnValues(
+        populationInfoMap,
+        regularVisitId,
+        populationInfo,
+        queenInfoMap,
+        changeQueenId,
+        queenInfo,
+        regularVisitMap,
+        changeQueenMap,
+        hiveId,
+        hive);
+  }
+
+  Hive generateReturnValues(
+      Map<String, Map<String, dynamic>> populationInfoMap,
+      regularVisitId,
+      PopulationInfo populationInfo,
+      Map<String, Map<String, dynamic>> queenInfoMap,
+      changeQueenId,
+      QueenInfo queenInfo,
+      regularVisitMap,
+      Map<String, Map<String, dynamic>> changeQueenMap,
+      hiveId,
+      Hive hive) {
+    PopulationInfo returnPopulationInfo = generateReturnPopulationInfo(
+        populationInfoMap, regularVisitId, populationInfo);
+    QueenInfo returnQueenInfo =
+        generateReturnQueenInfo(queenInfoMap, changeQueenId, queenInfo);
+    RegularVisit returnRegularVisit =
+        generateReturnRegularVisit(regularVisitMap, populationInfo);
+    ChangeQueen returnChangeQueen =
+        generateReturnChangeQueen(changeQueenMap, returnQueenInfo);
+    return Hive(hiveId, hive.number, hive.annualHoney, hive.description,
+        hive.picture, returnPopulationInfo, returnQueenInfo, [
+      returnRegularVisit,
+      returnChangeQueen,
+    ]);
+  }
+
+  ChangeQueen generateReturnChangeQueen(
+      Map<String, Map<String, dynamic>> changeQueenMap,
+      QueenInfo returnQueenInfo) {
+    var returnChangeQueen = ChangeQueen(
+        changeQueenMap['changeQueens']['id'],
+        changeQueenMap['changeQueens']['hiveId'],
+        changeQueenMap['changeQueens']['date'],
+        changeQueenMap['changeQueens']['pictures'],
+        changeQueenMap['changeQueens']['descriptions'],
+        returnQueenInfo);
+    return returnChangeQueen;
+  }
+
+  RegularVisit generateReturnRegularVisit(
+      regularVisitMap, PopulationInfo populationInfo) {
+    var returnRegularVisit = RegularVisit(
+        regularVisitMap['regularVisits']['id'],
+        regularVisitMap['regularVisits']['hiveId'],
+        regularVisitMap['regularVisits']['date'],
+        regularVisitMap['regularVisits']['pictures'],
+        regularVisitMap['regularVisits']['description'],
+        regularVisitMap['regularVisits']['behavior'],
+        regularVisitMap['regularVisits']['queenSeen'],
+        regularVisitMap['regularVisits']['honeyMaking'],
+        populationInfo);
+    return returnRegularVisit;
+  }
+
+  QueenInfo generateReturnQueenInfo(
+      Map<String, Map<String, dynamic>> queenInfoMap,
+      changeQueenId,
+      QueenInfo queenInfo) {
+    var returnQueenInfo = QueenInfo(
+        queenInfoMap['queenInfos']['id'],
+        changeQueenId,
+        queenInfo.enterDate,
+        queenInfo.breed,
+        queenInfo.backColor);
+    return returnQueenInfo;
+  }
+
+  PopulationInfo generateReturnPopulationInfo(
+      Map<String, Map<String, dynamic>> populationInfoMap,
+      regularVisitId,
+      PopulationInfo populationInfo) {
+    var returnPopulationInfo = PopulationInfo(
+        populationInfoMap['populationInfos']['id'],
+        regularVisitId,
+        populationInfo.frames,
+        populationInfo.stairs,
+        populationInfo.status);
+    return returnPopulationInfo;
+  }
+
+  Map<String, Map<String, dynamic>> insertQueenInfo(
+      changeQueenId, QueenInfo queenInfo) {
+    var queenInfoMap = {
+      'queenInfos': {
+        'id': this._idGen.generateId(),
+        'changeQueenId': changeQueenId,
+        'enterDate': queenInfo.enterDate,
+        'breed': queenInfo.breed,
+        'backColor': queenInfo.backColor
+      }
+    };
+    this._databaseWrapper.insert(queenInfoMap);
+    return queenInfoMap;
+  }
+
+  Map<String, Map<String, dynamic>> insertChangeQueen(changeQueenId, hiveId) {
+    var changeQueenMap = {
+      'changeQueens': {
+        'id': changeQueenId,
+        'hiveId': hiveId,
+        'date': _dateTimeProvider.getCurrentDateTime(),
+        'pictures': null,
+        'description': '',
+      }
+    };
+    this._databaseWrapper.insert(changeQueenMap);
+    return changeQueenMap;
+  }
+
+  Map<String, Map<String, dynamic>> insertPopulationInfo(
+      regularVisitId, PopulationInfo populationInfo) {
+    var populationInfoMap = {
+      'populationInfos': {
+        'id': this._idGen.generateId(),
+        'regularVisitId': regularVisitId,
+        'frames': populationInfo.frames,
+        'stairs': populationInfo.stairs,
+        'status': populationInfo.status
+      }
+    };
+    this._databaseWrapper.insert(populationInfoMap);
+    return populationInfoMap;
+  }
+
+  insertHive(Hive hive) {
     var hiveId = this._idGen.generateId();
     var hiveMap = {
       'hives': {
@@ -35,7 +183,10 @@ class HiveRepoImpl extends HiveRepo {
       }
     };
     this._databaseWrapper.insert(hiveMap);
-    var regularVisitId = this._idGen.generateId();
+    return hiveId;
+  }
+
+  insertRegularVisit(hiveId, regularVisitId) {
     var regularVisitMap = {
       'regularVisits': {
         'id': regularVisitId,
@@ -49,70 +200,6 @@ class HiveRepoImpl extends HiveRepo {
       }
     };
     this._databaseWrapper.insert(regularVisitMap);
-    var populationInfoMap = {
-      'populationInfos': {
-        'id': this._idGen.generateId(),
-        'regularVisitId': regularVisitId,
-        'frames': populationInfo.frames,
-        'stairs': populationInfo.stairs,
-        'status': populationInfo.status
-      }
-    };
-    this._databaseWrapper.insert(populationInfoMap);
-    var changeQueenId = this._idGen.generateId();
-    var changeQueenMap = {
-      'changeQueens': {
-        'id': changeQueenId,
-        'hiveId': hiveId,
-        'date': _dateTimeProvider.getCurrentDateTime(),
-        'pictures': null,
-        'description': '',
-      }
-    };
-    this._databaseWrapper.insert(changeQueenMap);
-    var queenInfoMap = {
-      'queenInfos': {
-        'id': this._idGen.generateId(),
-        'changeQueenId': changeQueenId,
-        'enterDate': queenInfo.enterDate,
-        'breed': queenInfo.breed,
-        'backColor': queenInfo.backColor
-      }
-    };
-    this._databaseWrapper.insert(queenInfoMap);
-    var returnPopulationInfo = PopulationInfo(
-        populationInfoMap['populationInfos']['id'],
-        regularVisitId,
-        populationInfo.frames,
-        populationInfo.stairs,
-        populationInfo.status);
-    var returnQueenInfo = QueenInfo(
-        queenInfoMap['queenInfos']['id'],
-        changeQueenId,
-        queenInfo.enterDate,
-        queenInfo.breed,
-        queenInfo.backColor);
-    var returnRegularVisit = RegularVisit(
-        regularVisitMap['regularVisits']['id'],
-        regularVisitMap['regularVisits']['hiveId'],
-        regularVisitMap['regularVisits']['date'],
-        regularVisitMap['regularVisits']['pictures'],
-        regularVisitMap['regularVisits']['description'],
-        regularVisitMap['regularVisits']['behavior'],
-        regularVisitMap['regularVisits']['queenSeen'],
-        regularVisitMap['regularVisits']['honeyMaking'],
-        populationInfo);
-    var returnChangeQueen = ChangeQueen(
-        changeQueenMap['changeQueens']['id'],
-        changeQueenMap['changeQueens']['hiveId'],
-        changeQueenMap['changeQueens']['date'],
-        changeQueenMap['changeQueens']['pictures'],
-        changeQueenMap['changeQueens']['descriptions'],
-        returnQueenInfo);
-    return Hive(hiveId, hive.number, hive.annualHoney, hive.description,
-        hive.picture, returnPopulationInfo, returnQueenInfo, [
-      returnRegularVisit,
-      returnChangeQueen,
-    ]);
+    return regularVisitMap;
   }
 }
