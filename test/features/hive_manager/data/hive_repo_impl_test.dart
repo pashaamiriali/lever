@@ -18,159 +18,359 @@ void main() {
   MockDateTimeProvider dateTimeProvider = MockDateTimeProvider();
   var currentDateTime = DateTime.now();
   when(dateTimeProvider.getCurrentDateTime()).thenReturn(currentDateTime);
-  test('should call insert (for hive) with proper mapped value', () {
-    HiveRepoImpl impl = HiveRepoImpl(dbWrapper, idGen, dateTimeProvider);
-    var properHiveMap = {
-      'hives': {
-        'id': 'someId3234',
-        'number': 1234,
-        'annualHoney': 34,
-        'description': 'some desc',
-        'picture': 'picturePath',
-      }
-    };
-    Hive hive =
-        Hive(null, 1234, 34, 'some desc', 'picturePath', null, null, null);
-    var populationInfo = PopulationInfo(null, 'regularVisitId', 20, 2, 'good');
-    var queenInfo = QueenInfo(
-      null,
-      'changeQueenId',
-      DateTime.now(),
-      'breed',
-      'black',
-    );
-    when(idGen.generateId()).thenReturn('someId3234');
-    impl.saveHive(hive, populationInfo, queenInfo);
-    expect(verify(dbWrapper.insert(captureAny)).captured[0], properHiveMap);
-  });
-  test('should call insert (for regular visit) with proper mapped value', () {
-    HiveRepoImpl impl = HiveRepoImpl(dbWrapper, idGen, dateTimeProvider);
+  group('saveHive', () {
+    test('should call insert (for hive) with proper mapped value', () {
+      HiveRepoImpl impl = HiveRepoImpl(dbWrapper, idGen, dateTimeProvider);
+      var properHiveMap = {
+        'hives': {
+          'id': 'someId3234',
+          'number': 1234,
+          'annualHoney': 34,
+          'description': 'some desc',
+          'picture': 'picturePath',
+        }
+      };
+      Hive hive =
+          Hive(null, 1234, 34, 'some desc', 'picturePath', null, null, null);
+      var populationInfo =
+          PopulationInfo(null, 'regularVisitId', 20, 2, 'good');
+      var queenInfo = QueenInfo(
+        null,
+        'changeQueenId',
+        DateTime.now(),
+        'breed',
+        'black',
+      );
+      when(idGen.generateId()).thenReturn('someId3234');
+      impl.saveHive(hive, populationInfo, queenInfo);
+      expect(verify(dbWrapper.insert(captureAny)).captured[0], properHiveMap);
+    });
+    test('should call insert (for regular visit) with proper mapped value', () {
+      HiveRepoImpl impl = HiveRepoImpl(dbWrapper, idGen, dateTimeProvider);
 
-    var properRegularVisitMap = {
-      'regularVisits': {
-        'id': 'someId3234',
-        'hiveId': 'someId3234',
-        'date': currentDateTime,
-        'pictures': null,
-        'description': '',
-        'behavior': '',
-        'queenSeen': true,
-        'honeyMaking': ''
-      }
-    };
-    Hive hive =
-        Hive(null, 1234, 34, 'some desc', 'picturePath', null, null, null);
-    var populationInfo = PopulationInfo(null, 'regularVisitId', 20, 2, 'good');
-    var queenInfo = QueenInfo(
-      null,
-      'changeQueenId',
-      DateTime.now(),
-      'breed',
-      'black',
-    );
-    when(idGen.generateId()).thenReturn('someId3234');
-    impl.saveHive(hive, populationInfo, queenInfo);
-    expect(verify(dbWrapper.insert(captureAny)).captured[1],
-        properRegularVisitMap);
-  });
-  test('should call insert (for population info) with proper mapped value', () {
-    HiveRepoImpl impl = HiveRepoImpl(dbWrapper, idGen, dateTimeProvider);
+      var properRegularVisitMap = {
+        'regularVisits': {
+          'id': 'someId3234',
+          'hiveId': 'someId3234',
+          'date': currentDateTime,
+          'pictures': null,
+          'description': '',
+          'behavior': '',
+          'queenSeen': true,
+          'honeyMaking': ''
+        }
+      };
+      Hive hive =
+          Hive(null, 1234, 34, 'some desc', 'picturePath', null, null, null);
+      var populationInfo =
+          PopulationInfo(null, 'regularVisitId', 20, 2, 'good');
+      var queenInfo = QueenInfo(
+        null,
+        'changeQueenId',
+        DateTime.now(),
+        'breed',
+        'black',
+      );
+      when(idGen.generateId()).thenReturn('someId3234');
+      impl.saveHive(hive, populationInfo, queenInfo);
+      expect(verify(dbWrapper.insert(captureAny)).captured[1],
+          properRegularVisitMap);
+    });
+    test('should call insert (for population info) with proper mapped value',
+        () {
+      HiveRepoImpl impl = HiveRepoImpl(dbWrapper, idGen, dateTimeProvider);
 
-    var properPopulationInfoMap = {
-      'populationInfos': {
-        'id': 'someId3234',
-        'regularVisitId': 'someId3234',
-        'frames': 20,
-        'stairs': 2,
-        'status': 'good'
-      }
-    };
-    Hive hive =
-        Hive(null, 1234, 34, 'some desc', 'picturePath', null, null, null);
-    var populationInfo = PopulationInfo(null, 'regularVisitId', 20, 2, 'good');
-    var queenInfo = QueenInfo(
-      null,
-      'changeQueenId',
-      DateTime.now(),
-      'breed',
-      'black',
-    );
-    when(idGen.generateId()).thenReturn('someId3234');
-    impl.saveHive(hive, populationInfo, queenInfo);
-    expect(verify(dbWrapper.insert(captureAny)).captured[2],
-        properPopulationInfoMap);
-  });
-  test('should call insert (for change queen) with proper mapped value', () {
-    HiveRepoImpl impl = HiveRepoImpl(dbWrapper, idGen, dateTimeProvider);
+      var properPopulationInfoMap = {
+        'populationInfos': {
+          'id': 'someId3234',
+          'regularVisitId': 'someId3234',
+          'frames': 20,
+          'stairs': 2,
+          'status': 'good'
+        }
+      };
+      Hive hive =
+          Hive(null, 1234, 34, 'some desc', 'picturePath', null, null, null);
+      var populationInfo =
+          PopulationInfo(null, 'regularVisitId', 20, 2, 'good');
+      var queenInfo = QueenInfo(
+        null,
+        'changeQueenId',
+        DateTime.now(),
+        'breed',
+        'black',
+      );
+      when(idGen.generateId()).thenReturn('someId3234');
+      impl.saveHive(hive, populationInfo, queenInfo);
+      expect(verify(dbWrapper.insert(captureAny)).captured[2],
+          properPopulationInfoMap);
+    });
+    test('should call insert (for change queen) with proper mapped value', () {
+      HiveRepoImpl impl = HiveRepoImpl(dbWrapper, idGen, dateTimeProvider);
 
-    var properChangeQueenMap = {
-      'changeQueens': {
-        'id': 'someId3234',
-        'hiveId': 'someId3234',
-        'date': currentDateTime,
-        'pictures': null,
-        'description': '',
-      }
-    };
-    Hive hive =
-        Hive(null, 1234, 34, 'some desc', 'picturePath', null, null, null);
-    var populationInfo = PopulationInfo(null, 'regularVisitId', 20, 2, 'good');
-    var queenInfo = QueenInfo(
-      null,
-      null,
-      DateTime.now(),
-      'breed',
-      'black',
-    );
-    when(idGen.generateId()).thenReturn('someId3234');
-    impl.saveHive(hive, populationInfo, queenInfo);
-    expect(
-        verify(dbWrapper.insert(captureAny)).captured[3], properChangeQueenMap);
-  });
-  test('should call insert (for queen info) with proper mapped value', () {
-    HiveRepoImpl impl = HiveRepoImpl(dbWrapper, idGen, dateTimeProvider);
+      var properChangeQueenMap = {
+        'changeQueens': {
+          'id': 'someId3234',
+          'hiveId': 'someId3234',
+          'date': currentDateTime,
+          'pictures': null,
+          'description': '',
+        }
+      };
+      Hive hive =
+          Hive(null, 1234, 34, 'some desc', 'picturePath', null, null, null);
+      var populationInfo =
+          PopulationInfo(null, 'regularVisitId', 20, 2, 'good');
+      var queenInfo = QueenInfo(
+        null,
+        null,
+        DateTime.now(),
+        'breed',
+        'black',
+      );
+      when(idGen.generateId()).thenReturn('someId3234');
+      impl.saveHive(hive, populationInfo, queenInfo);
+      expect(verify(dbWrapper.insert(captureAny)).captured[3],
+          properChangeQueenMap);
+    });
+    test('should call insert (for queen info) with proper mapped value', () {
+      HiveRepoImpl impl = HiveRepoImpl(dbWrapper, idGen, dateTimeProvider);
 
-    var properQueenInfo = {
-      'queenInfos': {
-        'id': 'someId3234',
-        'changeQueenId': 'someId3234',
-        'enterDate': currentDateTime,
-        'breed': 'breed',
-        'backColor': 'black'
-      }
-    };
-    Hive hive =
-        Hive(null, 1234, 34, 'some desc', 'picturePath', null, null, null);
-    var populationInfo = PopulationInfo(null, 'regularVisitId', 20, 2, 'good');
-    var queenInfo = QueenInfo(
-      null,
-      'changeQueenId',
-      currentDateTime,
-      'breed',
-      'black',
-    );
-    when(idGen.generateId()).thenReturn('someId3234');
-    impl.saveHive(hive, populationInfo, queenInfo);
-    expect(verify(dbWrapper.insert(captureAny)).captured[4],
-        properQueenInfo);
-  }); test('should return with a hive object that has an id and with inner objects that have ids', () async {
-    HiveRepoImpl impl = HiveRepoImpl(dbWrapper, idGen, dateTimeProvider);
-    Hive hive =
-        Hive(null, 1234, 34, 'some desc', 'picturePath', null, null, null);
-    var populationInfo = PopulationInfo(null, 'regularVisitId', 20, 2, 'good');
-    var queenInfo = QueenInfo(
-      null,
-      null,
-      currentDateTime,
-      'breed',
-      'black',
-    );
-    when(idGen.generateId()).thenReturn('someId3234');
-    Hive result=await impl.saveHive(hive, populationInfo, queenInfo);
-    expect(result.id,'someId3234');
-    expect(result.populationInfo.id,'someId3234');
-    expect(result.populationInfo.regularVisitId,'someId3234');
-    expect(result.queenInfo.id,'someId3234');
-    expect(result.queenInfo.changeQueenId,'someId3234');
+      var properQueenInfo = {
+        'queenInfos': {
+          'id': 'someId3234',
+          'changeQueenId': 'someId3234',
+          'enterDate': currentDateTime,
+          'breed': 'breed',
+          'backColor': 'black'
+        }
+      };
+      Hive hive =
+          Hive(null, 1234, 34, 'some desc', 'picturePath', null, null, null);
+      var populationInfo =
+          PopulationInfo(null, 'regularVisitId', 20, 2, 'good');
+      var queenInfo = QueenInfo(
+        null,
+        'changeQueenId',
+        currentDateTime,
+        'breed',
+        'black',
+      );
+      when(idGen.generateId()).thenReturn('someId3234');
+      impl.saveHive(hive, populationInfo, queenInfo);
+      expect(verify(dbWrapper.insert(captureAny)).captured[4], properQueenInfo);
+    });
+    test(
+        'should return with a hive object that has an id and with inner objects that have ids',
+        () async {
+      HiveRepoImpl impl = HiveRepoImpl(dbWrapper, idGen, dateTimeProvider);
+      Hive hive =
+          Hive(null, 1234, 34, 'some desc', 'picturePath', null, null, null);
+      var populationInfo =
+          PopulationInfo(null, 'regularVisitId', 20, 2, 'good');
+      var queenInfo = QueenInfo(
+        null,
+        null,
+        currentDateTime,
+        'breed',
+        'black',
+      );
+      when(idGen.generateId()).thenReturn('someId3234');
+      Hive result = await impl.saveHive(hive, populationInfo, queenInfo);
+      expect(result.id, 'someId3234');
+      expect(result.populationInfo.id, 'someId3234');
+      expect(result.populationInfo.regularVisitId, 'someId3234');
+      expect(result.queenInfo.id, 'someId3234');
+      expect(result.queenInfo.changeQueenId, 'someId3234');
+    });
+  });
+  group('fetchHives', () {
+    when(dbWrapper.select({'table': 'hives'})).thenAnswer((realInvocation) => [
+          {
+            'id': 'someId3234',
+            'number': 1234,
+            'annualHoney': 34,
+            'description': 'some desc',
+            'picture': 'picturePath',
+          }
+        ]);
+    when(
+      dbWrapper.selectFirst(
+        {
+          'table': 'regularVisits',
+          'where': {'hiveId': 'someId3234'},
+          'orderBy': {'date': 'ASC'}
+        },
+      ),
+    ).thenAnswer((realInvocation) => {
+          'id': 'someId3234',
+          'hiveId': 'someId3234',
+          'date': currentDateTime,
+          'pictures': ['picturePath1', 'picturePath2'],
+          'description': 'some desc',
+          'queenSeen': true,
+          'honeyMaking': 'good',
+          'behavior': 'calm'
+        });
+    when(
+      dbWrapper.selectFirst(
+        {
+          'table': 'populationInfos',
+          'where': {'regularVisitId': 'someId3234'}
+        },
+      ),
+    ).thenAnswer((realInvocation) => {
+          'id': 'someId3234',
+          'regularVisitId': 'someId3234',
+          'frames': 20,
+          'stairs': 2,
+          'status': 'strong'
+        });
+    when(
+      dbWrapper.selectFirst(
+        {
+          'table': 'changeQueens',
+          'where': {'hiveId': 'someId3234'},
+          'orderBy': {'date': 'ASC'}
+        },
+      ),
+    ).thenAnswer((realInvocation) => {
+          'id': 'someId3234',
+          'hiveId': 'someId3234',
+          'date': currentDateTime,
+          'pictures': ['picturePath1', 'picturePath2'],
+          'description': 'some desc',
+        });
+    when(
+      dbWrapper.selectFirst(
+        {
+          'table': 'queenInfos',
+          'where': {'changeQueenId': 'someId3234'}
+        },
+      ),
+    ).thenAnswer((realInvocation) => {
+          'id': 'someId3234',
+          'changeQueenId': 'someId3234',
+          'enterDate': currentDateTime,
+          'breed': 'some breed name',
+          'backColor': 'purple',
+        });
+    test('should call select on dbWrapper with proper args', () {
+      HiveRepoImpl impl = HiveRepoImpl(dbWrapper, idGen, dateTimeProvider);
+
+      impl.fetchHives();
+      var correctMap = {'table': 'hives'};
+      expect(verify(dbWrapper.select(captureAny)).captured[0], correctMap);
+    });
+    test('should call selectFirst (latest regularVisit) for each hive record',
+        () {
+      HiveRepoImpl impl = HiveRepoImpl(dbWrapper, idGen, dateTimeProvider);
+      impl.fetchHives();
+      var correctMap = {
+        'table': 'regularVisits',
+        'where': {'hiveId': 'someId3234'},
+        'orderBy': {'date': 'ASC'}
+      };
+      expect(verify(dbWrapper.selectFirst(captureAny)).captured[0], correctMap);
+    });
+    test('should call selectFirst (latest populationInfo) for each hive record',
+        () {
+      HiveRepoImpl impl = HiveRepoImpl(dbWrapper, idGen, dateTimeProvider);
+      impl.fetchHives();
+      var correctMap = {
+        'table': 'populationInfos',
+        'where': {'regularVisitId': 'someId3234'}
+      };
+      expect(verify(dbWrapper.selectFirst(captureAny)).captured[1], correctMap);
+    });
+    test('should call selectFirst (latest changeQueen) for each hive record',
+        () {
+      HiveRepoImpl impl = HiveRepoImpl(dbWrapper, idGen, dateTimeProvider);
+      impl.fetchHives();
+      var correctMap = {
+        'table': 'changeQueens',
+        'where': {'hiveId': 'someId3234'},
+        'orderBy': {'date': 'ASC'}
+      };
+      expect(verify(dbWrapper.selectFirst(captureAny)).captured[2], correctMap);
+    });
+    test('should call selectFirst (latest queenInfo) for each hive record', () {
+      HiveRepoImpl impl = HiveRepoImpl(dbWrapper, idGen, dateTimeProvider);
+      impl.fetchHives();
+      var correctMap = {
+        'table': 'queenInfos',
+        'where': {'changeQueenId': 'someId3234'}
+      };
+      expect(verify(dbWrapper.selectFirst(captureAny)).captured[3], correctMap);
+    });
+    test('should return a list of hive object with all the correct given data',
+        () async {
+      HiveRepoImpl impl = HiveRepoImpl(dbWrapper, idGen, dateTimeProvider);
+      var correctPopulationInfo =
+          PopulationInfo('someId3234', 'someId3234', 20, 2, 'strong');
+      var correctQueenInfo = QueenInfo('someId3234', 'someId3234',
+          currentDateTime, 'some breed name', 'purple');
+      var correctRegularVisit = RegularVisit(
+          'someId3234',
+          'someId3234',
+          currentDateTime,
+          ['picturePath1', 'picturePath2'],
+          'some desc',
+          'calm',
+          true,
+          'good',
+          correctPopulationInfo);
+      var correctChangeQueen = ChangeQueen(
+          'someId3234',
+          'someId3234',
+          currentDateTime,
+          ['picturePath1', 'picturePath2'],
+          'some desc',
+          correctQueenInfo);
+      var correctHivesList = [
+        Hive(
+            'someId3234',
+            1234,
+            34,
+            'some desc',
+            'picturePath',
+            correctPopulationInfo,
+            correctQueenInfo,
+            [correctRegularVisit, correctChangeQueen])
+      ];
+      List<Hive> result = await impl.fetchHives();
+      expect(result.length, correctHivesList.length);
+      expect(result[0].id, correctHivesList[0].id);
+      expect(result[0].picture, correctHivesList[0].picture);
+      expect(result[0].description, correctHivesList[0].description);
+      expect(result[0].annualHoney, correctHivesList[0].annualHoney);
+      expect(result[0].number, correctHivesList[0].number);
+      expect(result[0].queenInfo.id, correctHivesList[0].queenInfo.id);
+      expect(result[0].queenInfo.backColor,
+          correctHivesList[0].queenInfo.backColor);
+      expect(result[0].queenInfo.breed, correctHivesList[0].queenInfo.breed);
+      expect(result[0].queenInfo.enterDate,
+          correctHivesList[0].queenInfo.enterDate);
+      expect(result[0].queenInfo.changeQueenId,
+          correctHivesList[0].queenInfo.changeQueenId);
+      expect(
+          result[0].populationInfo.id, correctHivesList[0].populationInfo.id);
+      expect(result[0].populationInfo.regularVisitId,
+          correctHivesList[0].populationInfo.regularVisitId);
+      expect(result[0].populationInfo.status,
+          correctHivesList[0].populationInfo.status);
+      expect(result[0].populationInfo.stairs,
+          correctHivesList[0].populationInfo.stairs);
+      expect(result[0].populationInfo.frames,
+          correctHivesList[0].populationInfo.frames);
+      expect(result[0].visits.length, correctHivesList[0].visits.length);
+      expect(result[0].visits[0].id, correctHivesList[0].visits[0].id);
+      expect(result[0].visits[0].hiveId, correctHivesList[0].visits[0].hiveId);
+      expect(result[0].visits[0].description,
+          correctHivesList[0].visits[0].description);
+      expect(result[0].visits[0].date, correctHivesList[0].visits[0].date);
+      expect(result[0].visits[0].pictures.length,
+          correctHivesList[0].visits[0].pictures.length);
+    });
   });
 }

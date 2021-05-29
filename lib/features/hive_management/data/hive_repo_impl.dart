@@ -15,9 +15,25 @@ class HiveRepoImpl extends HiveRepo {
   HiveRepoImpl(this._databaseWrapper, this._idGen, this._dateTimeProvider);
 
   @override
-  fetchHives() {
-    // TODO: implement fetchHives
-    throw UnimplementedError();
+  Future<List<Hive>> fetchHives() async {
+    List<Hive> hivesList = [];
+    var rawHives = await this._databaseWrapper.select({'table': 'hives'});
+    for (var rawHive in rawHives) {
+      var rawRegularVisit = await fetchLastRegularVisit(rawHive);
+      var rawPopulationInfo = await fetchLastPopulationInfo(rawRegularVisit);
+      var rawChangeQueen = await fetchLastChangeQueen(rawHive);
+      var rawQueenInfo = await fetchLastQueenInfo(rawChangeQueen);
+
+      PopulationInfo populationInfo = generatePopulationInfo(rawPopulationInfo);
+      QueenInfo queenInfo = generateQueenInfo(rawQueenInfo);
+      RegularVisit regularVisit =
+          generateRegularVisit(rawRegularVisit, populationInfo);
+      ChangeQueen changeQueen = generateChangeQueen(rawChangeQueen, queenInfo);
+
+      hivesList.add(generateHive(
+          rawHive, populationInfo, queenInfo, regularVisit, changeQueen));
+    }
+    return hivesList;
   }
 
   @override
@@ -45,6 +61,100 @@ class HiveRepoImpl extends HiveRepo {
         changeQueenMap,
         hiveId,
         hive);
+  }
+
+  Hive generateHive(rawHive, PopulationInfo populationInfo, QueenInfo queenInfo,
+      RegularVisit regularVisit, ChangeQueen changeQueen) {
+    return Hive(
+        rawHive['id'],
+        rawHive['number'],
+        rawHive['annualHoney'],
+        rawHive['description'],
+        rawHive['picture'],
+        populationInfo,
+        queenInfo,
+        [regularVisit, changeQueen]);
+  }
+
+  ChangeQueen generateChangeQueen(rawChangeQueen, QueenInfo queenInfo) {
+    var changeQueen = ChangeQueen(
+        rawChangeQueen['id'],
+        rawChangeQueen['hiveId'],
+        rawChangeQueen['date'],
+        rawChangeQueen['pictures'],
+        rawChangeQueen['description'],
+        queenInfo);
+    return changeQueen;
+  }
+
+  RegularVisit generateRegularVisit(
+      rawRegularVisit, PopulationInfo populationInfo) {
+    var regularVisit = RegularVisit(
+        rawRegularVisit['id'],
+        rawRegularVisit['hiveId'],
+        rawRegularVisit['date'],
+        rawRegularVisit['pictures'],
+        rawRegularVisit['description'],
+        rawRegularVisit['behavior'],
+        rawRegularVisit['queenSeen'],
+        rawRegularVisit['honeyMaking'],
+        populationInfo);
+    return regularVisit;
+  }
+
+  QueenInfo generateQueenInfo(rawQueenInfo) {
+    var queenInfo = QueenInfo(
+        rawQueenInfo['id'],
+        rawQueenInfo['changeQueenId'],
+        rawQueenInfo['enterDate'],
+        rawQueenInfo['breed'],
+        rawQueenInfo['backColor']);
+    return queenInfo;
+  }
+
+  PopulationInfo generatePopulationInfo(rawPopulationInfo) {
+    var populationInfo = PopulationInfo(
+      rawPopulationInfo['id'],
+      rawPopulationInfo['regularVisitId'],
+      rawPopulationInfo['frames'],
+      rawPopulationInfo['stairs'],
+      rawPopulationInfo['status'],
+    );
+    return populationInfo;
+  }
+
+  Future<dynamic> fetchLastQueenInfo(rawChangeQueen) async {
+    var rawQueenInfo = await this._databaseWrapper.selectFirst({
+      'table': 'queenInfos',
+      'where': {'changeQueenId': rawChangeQueen['id']}
+    });
+    return rawQueenInfo;
+  }
+
+  Future<dynamic> fetchLastChangeQueen(rawHive) async {
+    var rawChangeQueen = await this._databaseWrapper.selectFirst({
+      'table': 'changeQueens',
+      'where': {'hiveId': rawHive['id']},
+      'orderBy': {'date': 'ASC'},
+    });
+    return rawChangeQueen;
+  }
+
+  Future<dynamic> fetchLastPopulationInfo(rawRegularVisit) async {
+    var rawPopulationInfo = await this._databaseWrapper.selectFirst({
+      'table': 'populationInfos',
+      'where': {'regularVisitId': rawRegularVisit['id']}
+    });
+    return rawPopulationInfo;
+  }
+
+  Future<dynamic> fetchLastRegularVisit(rawHive) async {
+    var rawRegularVisit = await this._databaseWrapper.selectFirst({
+      'table': 'regularVisits',
+      'where': {'hiveId': rawHive['id']},
+      'orderBy': {'date': 'ASC'},
+    });
+    return rawRegularVisit;
   }
 
   Hive generateReturnValues(
