@@ -12,6 +12,39 @@ class Hive {
   final QueenInfo queenInfo;
   final List<Visit> visits;
 
-  Hive(this.id, this.number, this.annualHoney, this.description,
-      this.picture, this.populationInfo, this.queenInfo, this.visits);
+  Hive(this.id, this.number, this.annualHoney, this.description, this.picture,
+      this.populationInfo, this.queenInfo, this.visits);
+
+  static Hive fromMap(Map<String, dynamic> map) {
+    return Hive(
+        map['id'],
+        map['number'],
+        map['annualHoney'],
+        map['description'],
+        map['picture'],
+        PopulationInfo.fromMap(map['populationInfo']),
+        QueenInfo.fromMap(map['queenInfo']),
+        visitsFromMapList(map['visits']));
+  }
+
+  static List<Visit> visitsFromMapList(List<Map> mapList) {
+    List<Visit> oVisits = [];
+    for (var map in mapList) {
+      oVisits.add(Visit.fromMap(map));
+    }
+    return oVisits;
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'id': this.id,
+      'number': this.number,
+      'annualHoney': this.annualHoney,
+      'description': this.description,
+      'picture': this.picture,
+      'populationInfo': this.populationInfo,
+      'queenInfo': this.queenInfo,
+      'visits': this.visits
+    };
+  }
 }
