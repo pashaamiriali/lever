@@ -11,6 +11,7 @@ class QueenInfo {
       this.id, this.changeQueenId, this.enterDate, this.breed, this.backColor);
 
   static QueenInfo fromMap(Map<String, dynamic> map) {
+    if (map == null) return null;
     return QueenInfo(map['id'], map['changeQueenId'], map['enterDate'],
         map['breed'], map['backColor']);
   }

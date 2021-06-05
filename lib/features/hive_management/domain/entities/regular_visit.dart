@@ -20,6 +20,7 @@ class RegularVisit extends Visit {
       : super(id, hiveId, date, pictures, description);
 
   static RegularVisit fromMap(Map<String, dynamic> map) {
+    if (map == null) return null;
     return RegularVisit(
       map['id'],
       map['hiveId'],
@@ -43,7 +44,7 @@ class RegularVisit extends Visit {
       'behavior': this.behavior,
       'queenSeen': this.queenSeen,
       'honeyMaking': this.honeyMaking,
-      'populationInfo': this.populationInfo.toMap()
+      'populationInfo': this.populationInfo?.toMap()
     };
   }
 }

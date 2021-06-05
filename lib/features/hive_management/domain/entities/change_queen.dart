@@ -9,6 +9,7 @@ class ChangeQueen extends Visit {
       : super(id, hiveId, date, pictures, description);
 
   static ChangeQueen fromMap(Map<String, dynamic> map) {
+    if (map == null) return null;
     return ChangeQueen(map['id'], map['hiveId'], map['date'], map['pictures'],
         map['description'], QueenInfo.fromMap(map['queenInfo']));
   }
@@ -20,7 +21,7 @@ class ChangeQueen extends Visit {
       'date': this.date,
       'pictures': this.pictures,
       'description': this.description,
-      'queenInfo': this.queenInfo.toMap()
+      'queenInfo': this.queenInfo?.toMap()
     };
   }
 }

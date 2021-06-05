@@ -9,6 +9,7 @@ class PopulationInfo {
       this.id, this.regularVisitId, this.frames, this.stairs, this.status);
 
   static PopulationInfo fromMap(Map<String, dynamic> map) {
+    if (map == null) return null;
     return PopulationInfo(map['id'], map['regularVisitId'], map['frames'],
         map['stairs'], map['status']);
   }

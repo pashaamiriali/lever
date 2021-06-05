@@ -1,3 +1,4 @@
+//TODO use built-in maps
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lever/core/infrastructure/data/database_provider.dart';
 import 'package:lever/core/infrastructure/data/date_time_provider.dart';
@@ -339,38 +340,7 @@ void main() {
             [correctRegularVisit, correctChangeQueen])
       ];
       List<Hive> result = await impl.fetchHives();
-      expect(result.length, correctHivesList.length);
-      expect(result[0].id, correctHivesList[0].id);
-      expect(result[0].picture, correctHivesList[0].picture);
-      expect(result[0].description, correctHivesList[0].description);
-      expect(result[0].annualHoney, correctHivesList[0].annualHoney);
-      expect(result[0].number, correctHivesList[0].number);
-      expect(result[0].queenInfo.id, correctHivesList[0].queenInfo.id);
-      expect(result[0].queenInfo.backColor,
-          correctHivesList[0].queenInfo.backColor);
-      expect(result[0].queenInfo.breed, correctHivesList[0].queenInfo.breed);
-      expect(result[0].queenInfo.enterDate,
-          correctHivesList[0].queenInfo.enterDate);
-      expect(result[0].queenInfo.changeQueenId,
-          correctHivesList[0].queenInfo.changeQueenId);
-      expect(
-          result[0].populationInfo.id, correctHivesList[0].populationInfo.id);
-      expect(result[0].populationInfo.regularVisitId,
-          correctHivesList[0].populationInfo.regularVisitId);
-      expect(result[0].populationInfo.status,
-          correctHivesList[0].populationInfo.status);
-      expect(result[0].populationInfo.stairs,
-          correctHivesList[0].populationInfo.stairs);
-      expect(result[0].populationInfo.frames,
-          correctHivesList[0].populationInfo.frames);
-      expect(result[0].visits.length, correctHivesList[0].visits.length);
-      expect(result[0].visits[0].id, correctHivesList[0].visits[0].id);
-      expect(result[0].visits[0].hiveId, correctHivesList[0].visits[0].hiveId);
-      expect(result[0].visits[0].description,
-          correctHivesList[0].visits[0].description);
-      expect(result[0].visits[0].date, correctHivesList[0].visits[0].date);
-      expect(result[0].visits[0].pictures.length,
-          correctHivesList[0].visits[0].pictures.length);
+      expect(result[0].toMap(),correctHivesList[0].toMap());
     });
   });
 }

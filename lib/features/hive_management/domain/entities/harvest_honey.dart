@@ -19,6 +19,7 @@ class HarvestHoney extends Visit {
       : super(id, hiveId, date, pictures, description);
 
   static HarvestHoney fromMap(Map<String, dynamic> map) {
+    if (map == null) return null;
     return HarvestHoney(
         map['id'],
         map['hiveId'],

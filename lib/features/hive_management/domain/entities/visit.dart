@@ -9,6 +9,7 @@ class Visit {
   Visit(this.id, this.hiveId, this.date, this.pictures, this.description);
 
   static Visit fromMap(Map<String, dynamic> map) {
+    if (map == null) return null;
     return Visit(map['id'], map['hiveId'], map['date'], map['pictures'],
         map['description']);
   }

@@ -24,11 +24,12 @@ class HiveRepoImpl extends HiveRepo {
       var rawChangeQueen = await fetchLastChangeQueen(rawHive);
       var rawQueenInfo = await fetchLastQueenInfo(rawChangeQueen);
 
-      PopulationInfo populationInfo = generatePopulationInfo(rawPopulationInfo);
-      QueenInfo queenInfo = generateQueenInfo(rawQueenInfo);
-      RegularVisit regularVisit =
-          generateRegularVisit(rawRegularVisit, populationInfo);
-      ChangeQueen changeQueen = generateChangeQueen(rawChangeQueen, queenInfo);
+      PopulationInfo populationInfo = PopulationInfo.fromMap(rawPopulationInfo);
+      QueenInfo queenInfo = QueenInfo.fromMap(rawQueenInfo);
+      rawRegularVisit['populationInfo'] = populationInfo.toMap();
+      RegularVisit regularVisit = RegularVisit.fromMap(rawRegularVisit);
+      rawChangeQueen['queenInfo'] = queenInfo.toMap();
+      ChangeQueen changeQueen = ChangeQueen.fromMap(rawChangeQueen);
 
       hivesList.add(generateHive(
           rawHive, populationInfo, queenInfo, regularVisit, changeQueen));
@@ -65,6 +66,8 @@ class HiveRepoImpl extends HiveRepo {
 
   Hive generateHive(rawHive, PopulationInfo populationInfo, QueenInfo queenInfo,
       RegularVisit regularVisit, ChangeQueen changeQueen) {
+    rawHive['populationInfo'] = populationInfo.toMap();
+    rawHive['queenInfo'] = queenInfo.toMap();
     return Hive(
         rawHive['id'],
         rawHive['number'],
@@ -76,52 +79,6 @@ class HiveRepoImpl extends HiveRepo {
         [regularVisit, changeQueen]);
   }
 
-  ChangeQueen generateChangeQueen(rawChangeQueen, QueenInfo queenInfo) {
-    var changeQueen = ChangeQueen(
-        rawChangeQueen['id'],
-        rawChangeQueen['hiveId'],
-        rawChangeQueen['date'],
-        rawChangeQueen['pictures'],
-        rawChangeQueen['description'],
-        queenInfo);
-    return changeQueen;
-  }
-
-  RegularVisit generateRegularVisit(
-      rawRegularVisit, PopulationInfo populationInfo) {
-    var regularVisit = RegularVisit(
-        rawRegularVisit['id'],
-        rawRegularVisit['hiveId'],
-        rawRegularVisit['date'],
-        rawRegularVisit['pictures'],
-        rawRegularVisit['description'],
-        rawRegularVisit['behavior'],
-        rawRegularVisit['queenSeen'],
-        rawRegularVisit['honeyMaking'],
-        populationInfo);
-    return regularVisit;
-  }
-
-  QueenInfo generateQueenInfo(rawQueenInfo) {
-    var queenInfo = QueenInfo(
-        rawQueenInfo['id'],
-        rawQueenInfo['changeQueenId'],
-        rawQueenInfo['enterDate'],
-        rawQueenInfo['breed'],
-        rawQueenInfo['backColor']);
-    return queenInfo;
-  }
-
-  PopulationInfo generatePopulationInfo(rawPopulationInfo) {
-    var populationInfo = PopulationInfo(
-      rawPopulationInfo['id'],
-      rawPopulationInfo['regularVisitId'],
-      rawPopulationInfo['frames'],
-      rawPopulationInfo['stairs'],
-      rawPopulationInfo['status'],
-    );
-    return populationInfo;
-  }
 
   Future<dynamic> fetchLastQueenInfo(rawChangeQueen) async {
     var rawQueenInfo = await this._databaseWrapper.selectFirst({
