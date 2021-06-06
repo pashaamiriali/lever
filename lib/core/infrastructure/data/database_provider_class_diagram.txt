@@ -1,0 +1,12 @@
+abstract class DatabaseWrapper:
+    insert(),select(),selectFirst()
+class DatabaseWrapperImp:
+    constructor(dbObject)
+    insert(map)->sqlQuery->execute=>return rowsEffected
+    select(map)->sqlQuery->execute->getRows=>return mappedRows
+    selectFirst(map)->sqlQuery->execute->getRow=>return mappedRow
+
+
+the implemented class will receive the database object be the injector at app start
+
+onCreate database sequence will be implemented separately

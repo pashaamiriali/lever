@@ -43,12 +43,12 @@ class HiveRepoImpl extends HiveRepo {
     var hiveId = insertHive(hive);
     var regularVisitId = this._idGen.generateId();
     var regularVisitMap = insertRegularVisit(hiveId, regularVisitId);
-    Map<String, Map<String, dynamic>> populationInfoMap =
+    Map<String, dynamic> populationInfoMap =
         insertPopulationInfo(regularVisitId, populationInfo);
     var changeQueenId = this._idGen.generateId();
-    Map<String, Map<String, dynamic>> changeQueenMap =
+    Map<String, dynamic> changeQueenMap =
         insertChangeQueen(changeQueenId, hiveId);
-    Map<String, Map<String, dynamic>> queenInfoMap =
+    Map<String, dynamic> queenInfoMap =
         insertQueenInfo(changeQueenId, queenInfo);
 
     return generateReturnValues(
@@ -79,11 +79,11 @@ class HiveRepoImpl extends HiveRepo {
         [regularVisit, changeQueen]);
   }
 
-
   Future<dynamic> fetchLastQueenInfo(rawChangeQueen) async {
     var rawQueenInfo = await this._databaseWrapper.selectFirst({
       'table': 'queenInfos',
-      'where': {'changeQueenId': rawChangeQueen['id']}
+      'where': 'changeQueenId = ?',
+      'whereArgs':  [rawChangeQueen['id']]
     });
     return rawQueenInfo;
   }
@@ -91,8 +91,9 @@ class HiveRepoImpl extends HiveRepo {
   Future<dynamic> fetchLastChangeQueen(rawHive) async {
     var rawChangeQueen = await this._databaseWrapper.selectFirst({
       'table': 'changeQueens',
-      'where': {'hiveId': rawHive['id']},
-      'orderBy': {'date': 'ASC'},
+      'where': 'hiveId = ?',
+      'whereArgs': [rawHive['id']],
+      'orderBy': 'date DEC',
     });
     return rawChangeQueen;
   }
@@ -100,7 +101,8 @@ class HiveRepoImpl extends HiveRepo {
   Future<dynamic> fetchLastPopulationInfo(rawRegularVisit) async {
     var rawPopulationInfo = await this._databaseWrapper.selectFirst({
       'table': 'populationInfos',
-      'where': {'regularVisitId': rawRegularVisit['id']}
+      'where': 'regularVisitId = ?',
+      'whereArgs': [rawRegularVisit['id']],
     });
     return rawPopulationInfo;
   }
@@ -108,21 +110,22 @@ class HiveRepoImpl extends HiveRepo {
   Future<dynamic> fetchLastRegularVisit(rawHive) async {
     var rawRegularVisit = await this._databaseWrapper.selectFirst({
       'table': 'regularVisits',
-      'where': {'hiveId': rawHive['id']},
-      'orderBy': {'date': 'ASC'},
+      'where': 'hiveId = ?',
+      'whereArgs': [rawHive['id']],
+      'orderBy': 'date DEC',
     });
     return rawRegularVisit;
   }
 
   Hive generateReturnValues(
-      Map<String, Map<String, dynamic>> populationInfoMap,
+      Map<String, dynamic> populationInfoMap,
       regularVisitId,
       PopulationInfo populationInfo,
-      Map<String, Map<String, dynamic>> queenInfoMap,
+      Map<String, dynamic> queenInfoMap,
       changeQueenId,
       QueenInfo queenInfo,
       regularVisitMap,
-      Map<String, Map<String, dynamic>> changeQueenMap,
+      Map<String, dynamic> changeQueenMap,
       hiveId,
       Hive hive) {
     PopulationInfo returnPopulationInfo = generateReturnPopulationInfo(
@@ -141,14 +144,13 @@ class HiveRepoImpl extends HiveRepo {
   }
 
   ChangeQueen generateReturnChangeQueen(
-      Map<String, Map<String, dynamic>> changeQueenMap,
-      QueenInfo returnQueenInfo) {
+      Map<String, dynamic> changeQueenMap, QueenInfo returnQueenInfo) {
     var returnChangeQueen = ChangeQueen(
-        changeQueenMap['changeQueens']['id'],
-        changeQueenMap['changeQueens']['hiveId'],
-        changeQueenMap['changeQueens']['date'],
-        changeQueenMap['changeQueens']['pictures'],
-        changeQueenMap['changeQueens']['descriptions'],
+        changeQueenMap['tableData']['id'],
+        changeQueenMap['tableData']['hiveId'],
+        changeQueenMap['tableData']['date'],
+        changeQueenMap['tableData']['pictures'],
+        changeQueenMap['tableData']['descriptions'],
         returnQueenInfo);
     return returnChangeQueen;
   }
@@ -156,24 +158,22 @@ class HiveRepoImpl extends HiveRepo {
   RegularVisit generateReturnRegularVisit(
       regularVisitMap, PopulationInfo populationInfo) {
     var returnRegularVisit = RegularVisit(
-        regularVisitMap['regularVisits']['id'],
-        regularVisitMap['regularVisits']['hiveId'],
-        regularVisitMap['regularVisits']['date'],
-        regularVisitMap['regularVisits']['pictures'],
-        regularVisitMap['regularVisits']['description'],
-        regularVisitMap['regularVisits']['behavior'],
-        regularVisitMap['regularVisits']['queenSeen'],
-        regularVisitMap['regularVisits']['honeyMaking'],
+        regularVisitMap['tableData']['id'],
+        regularVisitMap['tableData']['hiveId'],
+        regularVisitMap['tableData']['date'],
+        regularVisitMap['tableData']['pictures'],
+        regularVisitMap['tableData']['description'],
+        regularVisitMap['tableData']['behavior'],
+        regularVisitMap['tableData']['queenSeen'],
+        regularVisitMap['tableData']['honeyMaking'],
         populationInfo);
     return returnRegularVisit;
   }
 
   QueenInfo generateReturnQueenInfo(
-      Map<String, Map<String, dynamic>> queenInfoMap,
-      changeQueenId,
-      QueenInfo queenInfo) {
+      Map<String, dynamic> queenInfoMap, changeQueenId, QueenInfo queenInfo) {
     var returnQueenInfo = QueenInfo(
-        queenInfoMap['queenInfos']['id'],
+        queenInfoMap['tableData']['id'],
         changeQueenId,
         queenInfo.enterDate,
         queenInfo.breed,
@@ -182,11 +182,11 @@ class HiveRepoImpl extends HiveRepo {
   }
 
   PopulationInfo generateReturnPopulationInfo(
-      Map<String, Map<String, dynamic>> populationInfoMap,
+      Map<String, dynamic> populationInfoMap,
       regularVisitId,
       PopulationInfo populationInfo) {
     var returnPopulationInfo = PopulationInfo(
-        populationInfoMap['populationInfos']['id'],
+        populationInfoMap['tableData']['id'],
         regularVisitId,
         populationInfo.frames,
         populationInfo.stairs,
@@ -194,10 +194,10 @@ class HiveRepoImpl extends HiveRepo {
     return returnPopulationInfo;
   }
 
-  Map<String, Map<String, dynamic>> insertQueenInfo(
-      changeQueenId, QueenInfo queenInfo) {
+  Map<String, dynamic> insertQueenInfo(changeQueenId, QueenInfo queenInfo) {
     var queenInfoMap = {
-      'queenInfos': {
+      'table': 'queenInfos',
+      'tableData': {
         'id': this._idGen.generateId(),
         'changeQueenId': changeQueenId,
         'enterDate': queenInfo.enterDate,
@@ -209,9 +209,10 @@ class HiveRepoImpl extends HiveRepo {
     return queenInfoMap;
   }
 
-  Map<String, Map<String, dynamic>> insertChangeQueen(changeQueenId, hiveId) {
+  Map<String, dynamic> insertChangeQueen(changeQueenId, hiveId) {
     var changeQueenMap = {
-      'changeQueens': {
+      'table': 'changeQueens',
+      'tableData': {
         'id': changeQueenId,
         'hiveId': hiveId,
         'date': _dateTimeProvider.getCurrentDateTime(),
@@ -223,10 +224,11 @@ class HiveRepoImpl extends HiveRepo {
     return changeQueenMap;
   }
 
-  Map<String, Map<String, dynamic>> insertPopulationInfo(
+  Map<String, dynamic> insertPopulationInfo(
       regularVisitId, PopulationInfo populationInfo) {
     var populationInfoMap = {
-      'populationInfos': {
+      'table': 'populationInfos',
+      'tableData': {
         'id': this._idGen.generateId(),
         'regularVisitId': regularVisitId,
         'frames': populationInfo.frames,
@@ -241,7 +243,8 @@ class HiveRepoImpl extends HiveRepo {
   insertHive(Hive hive) {
     var hiveId = this._idGen.generateId();
     var hiveMap = {
-      'hives': {
+      'table': 'hives',
+      'tableData': {
         'id': hiveId,
         'number': hive.number,
         'annualHoney': hive.annualHoney,
@@ -255,7 +258,8 @@ class HiveRepoImpl extends HiveRepo {
 
   insertRegularVisit(hiveId, regularVisitId) {
     var regularVisitMap = {
-      'regularVisits': {
+      'table': 'regularVisits',
+      'tableData': {
         'id': regularVisitId,
         'hiveId': hiveId,
         'date': _dateTimeProvider.getCurrentDateTime(),

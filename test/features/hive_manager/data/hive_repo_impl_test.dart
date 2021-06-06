@@ -1,4 +1,3 @@
-//TODO use built-in maps
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lever/core/infrastructure/data/database_provider.dart';
 import 'package:lever/core/infrastructure/data/date_time_provider.dart';
@@ -23,7 +22,8 @@ void main() {
     test('should call insert (for hive) with proper mapped value', () {
       HiveRepoImpl impl = HiveRepoImpl(dbWrapper, idGen, dateTimeProvider);
       var properHiveMap = {
-        'hives': {
+        'table': 'hives',
+        'tableData': {
           'id': 'someId3234',
           'number': 1234,
           'annualHoney': 34,
@@ -50,7 +50,8 @@ void main() {
       HiveRepoImpl impl = HiveRepoImpl(dbWrapper, idGen, dateTimeProvider);
 
       var properRegularVisitMap = {
-        'regularVisits': {
+        'table': 'regularVisits',
+        'tableData': {
           'id': 'someId3234',
           'hiveId': 'someId3234',
           'date': currentDateTime,
@@ -82,7 +83,8 @@ void main() {
       HiveRepoImpl impl = HiveRepoImpl(dbWrapper, idGen, dateTimeProvider);
 
       var properPopulationInfoMap = {
-        'populationInfos': {
+        'table': 'populationInfos',
+        'tableData': {
           'id': 'someId3234',
           'regularVisitId': 'someId3234',
           'frames': 20,
@@ -110,7 +112,8 @@ void main() {
       HiveRepoImpl impl = HiveRepoImpl(dbWrapper, idGen, dateTimeProvider);
 
       var properChangeQueenMap = {
-        'changeQueens': {
+        'table': 'changeQueens',
+        'tableData': {
           'id': 'someId3234',
           'hiveId': 'someId3234',
           'date': currentDateTime,
@@ -138,7 +141,8 @@ void main() {
       HiveRepoImpl impl = HiveRepoImpl(dbWrapper, idGen, dateTimeProvider);
 
       var properQueenInfo = {
-        'queenInfos': {
+        'table': 'queenInfos',
+        'tableData': {
           'id': 'someId3234',
           'changeQueenId': 'someId3234',
           'enterDate': currentDateTime,
@@ -199,8 +203,9 @@ void main() {
       dbWrapper.selectFirst(
         {
           'table': 'regularVisits',
-          'where': {'hiveId': 'someId3234'},
-          'orderBy': {'date': 'ASC'}
+          'where': 'hiveId = ?',
+          'whereArgs': ['someId3234'],
+          'orderBy': 'date DEC'
         },
       ),
     ).thenAnswer((realInvocation) => {
@@ -217,7 +222,8 @@ void main() {
       dbWrapper.selectFirst(
         {
           'table': 'populationInfos',
-          'where': {'regularVisitId': 'someId3234'}
+          'where': 'regularVisitId = ?',
+          'whereArgs':['someId3234'],
         },
       ),
     ).thenAnswer((realInvocation) => {
@@ -231,8 +237,9 @@ void main() {
       dbWrapper.selectFirst(
         {
           'table': 'changeQueens',
-          'where': {'hiveId': 'someId3234'},
-          'orderBy': {'date': 'ASC'}
+          'where': 'hiveId = ?',
+          'whereArgs':['someId3234'],
+          'orderBy': 'date DEC'
         },
       ),
     ).thenAnswer((realInvocation) => {
@@ -246,7 +253,8 @@ void main() {
       dbWrapper.selectFirst(
         {
           'table': 'queenInfos',
-          'where': {'changeQueenId': 'someId3234'}
+          'where': 'changeQueenId = ?',
+          'whereArgs': ['someId3234'],
         },
       ),
     ).thenAnswer((realInvocation) => {
@@ -269,8 +277,9 @@ void main() {
       impl.fetchHives();
       var correctMap = {
         'table': 'regularVisits',
-        'where': {'hiveId': 'someId3234'},
-        'orderBy': {'date': 'ASC'}
+        'where': 'hiveId = ?',
+        'whereArgs': ['someId3234'],
+        'orderBy': 'date DEC'
       };
       expect(verify(dbWrapper.selectFirst(captureAny)).captured[0], correctMap);
     });
@@ -280,7 +289,8 @@ void main() {
       impl.fetchHives();
       var correctMap = {
         'table': 'populationInfos',
-        'where': {'regularVisitId': 'someId3234'}
+        'where': 'regularVisitId = ?',
+        'whereArgs':['someId3234']
       };
       expect(verify(dbWrapper.selectFirst(captureAny)).captured[1], correctMap);
     });
@@ -290,8 +300,9 @@ void main() {
       impl.fetchHives();
       var correctMap = {
         'table': 'changeQueens',
-        'where': {'hiveId': 'someId3234'},
-        'orderBy': {'date': 'ASC'}
+        'where': 'hiveId = ?',
+        'whereArgs': ['someId3234'],
+        'orderBy': 'date DEC'
       };
       expect(verify(dbWrapper.selectFirst(captureAny)).captured[2], correctMap);
     });
@@ -300,7 +311,8 @@ void main() {
       impl.fetchHives();
       var correctMap = {
         'table': 'queenInfos',
-        'where': {'changeQueenId': 'someId3234'}
+        'where': 'changeQueenId = ?',
+        'whereArgs': ['someId3234']
       };
       expect(verify(dbWrapper.selectFirst(captureAny)).captured[3], correctMap);
     });
@@ -340,7 +352,7 @@ void main() {
             [correctRegularVisit, correctChangeQueen])
       ];
       List<Hive> result = await impl.fetchHives();
-      expect(result[0].toMap(),correctHivesList[0].toMap());
+      expect(result[0].toMap(), correctHivesList[0].toMap());
     });
   });
 }
