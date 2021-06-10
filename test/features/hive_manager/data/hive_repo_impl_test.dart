@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lever/core/infrastructure/data/database_provider.dart';
 import 'package:lever/core/infrastructure/data/date_time_provider.dart';
@@ -55,7 +57,7 @@ void main() {
           'id': 'someId3234',
           'hiveId': 'someId3234',
           'date': currentDateTime,
-          'pictures': null,
+          'pictures': json.encode(null),
           'description': '',
           'behavior': '',
           'queenSeen': true,
@@ -117,7 +119,7 @@ void main() {
           'id': 'someId3234',
           'hiveId': 'someId3234',
           'date': currentDateTime,
-          'pictures': null,
+          'pictures': json.encode(null),
           'description': '',
         }
       };
@@ -212,7 +214,7 @@ void main() {
           'id': 'someId3234',
           'hiveId': 'someId3234',
           'date': currentDateTime,
-          'pictures': ['picturePath1', 'picturePath2'],
+          'pictures': json.encode(['picturePath1', 'picturePath2']),
           'description': 'some desc',
           'queenSeen': true,
           'honeyMaking': 'good',
@@ -246,7 +248,7 @@ void main() {
           'id': 'someId3234',
           'hiveId': 'someId3234',
           'date': currentDateTime,
-          'pictures': ['picturePath1', 'picturePath2'],
+          'pictures': json.encode(['picturePath1', 'picturePath2']) ,
           'description': 'some desc',
         });
     when(

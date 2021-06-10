@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:lever/core/infrastructure/data/database_provider.dart';
 import 'package:lever/core/infrastructure/data/date_time_provider.dart';
 import 'package:lever/core/infrastructure/data/id_generator.dart';
@@ -149,7 +151,7 @@ class HiveRepoImpl extends HiveRepo {
         changeQueenMap['tableData']['id'],
         changeQueenMap['tableData']['hiveId'],
         changeQueenMap['tableData']['date'],
-        changeQueenMap['tableData']['pictures'],
+        json.decode(changeQueenMap['tableData']['pictures']),
         changeQueenMap['tableData']['descriptions'],
         returnQueenInfo);
     return returnChangeQueen;
@@ -161,7 +163,7 @@ class HiveRepoImpl extends HiveRepo {
         regularVisitMap['tableData']['id'],
         regularVisitMap['tableData']['hiveId'],
         regularVisitMap['tableData']['date'],
-        regularVisitMap['tableData']['pictures'],
+       json.decode( regularVisitMap['tableData']['pictures']),
         regularVisitMap['tableData']['description'],
         regularVisitMap['tableData']['behavior'],
         regularVisitMap['tableData']['queenSeen'],
@@ -216,7 +218,7 @@ class HiveRepoImpl extends HiveRepo {
         'id': changeQueenId,
         'hiveId': hiveId,
         'date': _dateTimeProvider.getCurrentDateTime(),
-        'pictures': null,
+        'pictures': json.encode(null),
         'description': '',
       }
     };
@@ -263,7 +265,7 @@ class HiveRepoImpl extends HiveRepo {
         'id': regularVisitId,
         'hiveId': hiveId,
         'date': _dateTimeProvider.getCurrentDateTime(),
-        'pictures': null,
+        'pictures': json.encode(null),
         'description': '',
         'behavior': '',
         'queenSeen': true,

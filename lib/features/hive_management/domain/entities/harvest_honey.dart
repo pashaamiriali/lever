@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'visit.dart';
 
 class HarvestHoney extends Visit {
@@ -24,7 +26,7 @@ class HarvestHoney extends Visit {
         map['id'],
         map['hiveId'],
         map['date'],
-        map['pictures'],
+        (json.decode(map['pictures']) as List<dynamic>).cast<String>(),
         map['description'],
         map['describedAmount'],
         map['frames'],
@@ -37,7 +39,7 @@ class HarvestHoney extends Visit {
       'id': this.id,
       'hiveId': this.hiveId,
       'date': this.date,
-      'pictures': this.pictures,
+      'pictures': json.encode(this.pictures),
       'description': this.description,
       'describedAmount': this.describedAmount,
       'frames': this.frames,

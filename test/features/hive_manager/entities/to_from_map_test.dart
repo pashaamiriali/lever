@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lever/features/hive_management/domain/entities/entities.dart';
 
@@ -42,7 +44,7 @@ void main() {
         'id': 'someId1234',
         'hiveId': 'someId1234',
         'date': DateTime.now(),
-        'pictures': ['picturePath'],
+        'pictures': json.encode(['picturePath']),
         'description': 'someDesc',
         'behavior': 'calm',
         'queenSeen': true,
@@ -53,7 +55,8 @@ void main() {
               expectedMap['id'],
               expectedMap['hiveId'],
               expectedMap['date'],
-              expectedMap['pictures'],
+              (json.decode(expectedMap['pictures']) as List<dynamic>)
+                  .cast<String>(),
               expectedMap['description'],
               expectedMap['behavior'],
               expectedMap['queenSeen'],
@@ -67,7 +70,7 @@ void main() {
         'id': 'someId1234',
         'hiveId': 'someId1234',
         'date': DateTime.now(),
-        'pictures': ['picturePath'],
+        'pictures': json.encode(['picturePath']),
         'description': 'someDesc',
         'queenInfo': null,
       };
@@ -75,7 +78,8 @@ void main() {
               expectedMap['id'],
               expectedMap['hiveId'],
               expectedMap['date'],
-              expectedMap['pictures'],
+              (json.decode(expectedMap['pictures']) as List<dynamic>)
+                  .cast<String>(),
               expectedMap['description'],
               expectedMap['queenInfo'])
           .toMap();
@@ -86,7 +90,7 @@ void main() {
         'id': 'someId1234',
         'hiveId': 'someId1234',
         'date': DateTime.now(),
-        'pictures': ['picturePath'],
+        'pictures': json.encode(['picturePath']),
         'description': 'someDesc',
         'describedAmount': 'good',
         'frames': 10,
@@ -97,7 +101,8 @@ void main() {
               expectedMap['id'],
               expectedMap['hiveId'],
               expectedMap['date'],
-              expectedMap['pictures'],
+              (json.decode(expectedMap['pictures']) as List<dynamic>)
+                  .cast<String>(),
               expectedMap['description'],
               expectedMap['describedAmount'],
               expectedMap['frames'],
@@ -111,14 +116,14 @@ void main() {
         'id': 'someId1234',
         'hiveId': 'someId1234',
         'date': DateTime.now(),
-        'pictures': ['picturePath'],
+        'pictures': json.encode(['picturePath']),
         'description': 'someDesc',
       };
       var result = Visit(
         expectedMap['id'],
         expectedMap['hiveId'],
         expectedMap['date'],
-        expectedMap['pictures'],
+        (json.decode(expectedMap['pictures']) as List<dynamic>).cast<String>(),
         expectedMap['description'],
       ).toMap();
       expect(result, expectedMap);
@@ -180,7 +185,7 @@ void main() {
         'id': 'someId1234',
         'hiveId': 'someId1234',
         'date': DateTime.now(),
-        'pictures': ['picturePath'],
+        'pictures': json.encode(['picturePath']),
         'description': 'someDesc',
         'behavior': 'calm',
         'queenSeen': true,
@@ -197,7 +202,7 @@ void main() {
         'id': 'someId1234',
         'hiveId': 'someId1234',
         'date': DateTime.now(),
-        'pictures': ['picturePath'],
+        'pictures': json.encode(['picturePath']),
         'description': 'someDesc',
         'queenInfo': null,
       };
@@ -211,7 +216,7 @@ void main() {
         'id': 'someId1234',
         'hiveId': 'someId1234',
         'date': DateTime.now(),
-        'pictures': ['picturePath'],
+        'pictures': json.encode(['picturePath']),
         'description': 'someDesc',
         'describedAmount': 'good',
         'frames': 10,
@@ -226,7 +231,7 @@ void main() {
         'id': 'someId1234',
         'hiveId': 'someId1234',
         'date': DateTime.now(),
-        'pictures': ['picturePath'],
+        'pictures': json.encode(['picturePath']),
         'description': 'someDesc',
       };
       var result = Visit.fromMap(expectedMap);

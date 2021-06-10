@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 class Visit {
   final String id;
 
@@ -10,7 +12,7 @@ class Visit {
 
   static Visit fromMap(Map<String, dynamic> map) {
     if (map == null) return null;
-    return Visit(map['id'], map['hiveId'], map['date'], map['pictures'],
+    return Visit(map['id'], map['hiveId'], map['date'], (json.decode(map['pictures']) as List<dynamic>).cast<String>(),
         map['description']);
   }
 
@@ -19,7 +21,7 @@ class Visit {
       'id': this.id,
       'hiveId': this.hiveId,
       'date': this.date,
-      'pictures': this.pictures,
+      'pictures': json.encode(this.pictures),
       'description': this.description
     };
   }

@@ -1,5 +1,3 @@
-import 'change_queen.dart';
-
 class QueenInfo {
   final String id;
   final String changeQueenId;

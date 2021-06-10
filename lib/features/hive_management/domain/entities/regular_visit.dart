@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'population_info.dart';
 import 'visit.dart';
 
@@ -25,7 +27,7 @@ class RegularVisit extends Visit {
       map['id'],
       map['hiveId'],
       map['date'],
-      map['pictures'],
+      (json.decode(map['pictures']) as List<dynamic>).cast<String>(),
       map['description'],
       map['behavior'],
       map['queenSeen'],
@@ -39,7 +41,7 @@ class RegularVisit extends Visit {
       'id': this.id,
       'hiveId': this.hiveId,
       'date': this.date,
-      'pictures': this.pictures,
+      'pictures': json.encode(this.pictures),
       'description': this.description,
       'behavior': this.behavior,
       'queenSeen': this.queenSeen,

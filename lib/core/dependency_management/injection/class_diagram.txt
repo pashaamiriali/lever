@@ -1,0 +1,10 @@
+Requirements:
+    Lazy loading on feature demand
+    full access through the application (all features core included)
+
+Descriptions:
+    the commands should be accessible in the presentation logic, so the presentation logic will, in turn, receive them,
+    as constructor arguments.
+    like so:
+        HiveManagementModel(AddHiveCmnd, FetchHivesCmnd, FetchHiveCmnd, ...);
+    all of these command objects should be instantiated in a form of injector algorithm.

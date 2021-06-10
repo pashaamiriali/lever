@@ -25,6 +25,9 @@ dependencies:
     sdk: flutter
   mockito: ^5.0.8
   sqflite: ^2.0.0+3
+  uuid: ^3.0.4
+  path: ^1.8.0
+  provider: ^5.0.0
 
 
   # The following adds the Cupertino Icons font to your application.

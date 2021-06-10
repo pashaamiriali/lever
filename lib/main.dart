@@ -1,33 +1,47 @@
 import 'package:flutter/material.dart';
+import 'package:lever/core/dependency_management/injection/InjectorProvider.dart';
+import 'package:lever/core/dependency_management/injection/injector.dart';
 
-void main() {
-  runApp(MyApp());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  var injector = Injector();
+  await injector.initiate();
+  runApp(MyApp(
+    injector: injector,
+  ));
 }
 
 class MyApp extends StatelessWidget {
+  final Injector injector;
+
+  const MyApp({Key key, this.injector}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        primarySwatch: Colors.indigo,
-        colorScheme: ColorScheme(
-          brightness: Brightness.light,
-          primary: Colors.indigo,
-          primaryVariant: Colors.deepPurple,
-          onPrimary: Colors.white,
-          secondary: Colors.amber,
-          secondaryVariant: Colors.yellow,
-          onSecondary: Colors.black54,
-          surface: Colors.white,
-          onSurface: Colors.black54,
-          background: Colors.white,
-          onBackground: Colors.black54,
-          error: Colors.red,
-          onError: Colors.white,
+    return InjectorProvider(
+      injector: this.injector,
+      child: MaterialApp(
+        title: 'Flutter Demo',
+        theme: ThemeData(
+          primarySwatch: Colors.indigo,
+          colorScheme: ColorScheme(
+            brightness: Brightness.light,
+            primary: Colors.indigo,
+            primaryVariant: Colors.deepPurple,
+            onPrimary: Colors.white,
+            secondary: Colors.amber,
+            secondaryVariant: Colors.yellow,
+            onSecondary: Colors.black54,
+            surface: Colors.white,
+            onSurface: Colors.black54,
+            background: Colors.white,
+            onBackground: Colors.black54,
+            error: Colors.red,
+            onError: Colors.white,
+          ),
         ),
+        home: MyHomePage(title: 'Flutter Demo Home Page'),
       ),
-      home: MyHomePage(title: 'Flutter Demo Home Page'),
     );
   }
 }
