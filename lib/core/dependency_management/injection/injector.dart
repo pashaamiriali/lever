@@ -19,22 +19,25 @@ class Injector {
   DateTimeProvider _datetimeProvider;
   HiveRepoImpl _hiveRepoImpl;
   Future initiate() async {
-    await _instantiateDb();
+    this._db=await _instantiateDb();
     this._uuid = Uuid();
     this._dbWrapper = DatabaseWrapperImpl(this._db);
     this._idGen = IDGenImpl(_uuid);
     this._datetimeProvider = DateTimeProviderImpl();
-    this._hiveRepoImpl=HiveRepoImpl(this._dbWrapper, this._idGen, this._datetimeProvider);
+    this._hiveRepoImpl =
+        HiveRepoImpl(this._dbWrapper, this._idGen, this._datetimeProvider);
   }
 
   Future<Database> _instantiateDb() async {
     final databasePath = await getDatabasesPath();
+
     final path = join(databasePath, DB_NAME);
     return await openDatabase(path, version: 1,
         onCreate: (Database db, version) async {
       await DatabaseInitializer.createTables(db);
     });
   }
-  AddHiveCmnd get getAddHiveCmnd=>AddHiveCmnd(this._hiveRepoImpl);
-  FetchHivesCmnd get getFetchHivesCmnd=>FetchHivesCmnd(this._hiveRepoImpl);
+
+  AddHiveCmnd get getAddHiveCmnd => AddHiveCmnd(this._hiveRepoImpl);
+  FetchHivesCmnd get getFetchHivesCmnd => FetchHivesCmnd(this._hiveRepoImpl);
 }
