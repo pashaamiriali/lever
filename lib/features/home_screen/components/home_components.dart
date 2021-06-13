@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:lever/core/components/global_view_components.dart';
 import 'package:lever/features/hive_management/domain/entities/entities.dart';
 import 'package:lever/features/home_screen/logic/home_screen_model.dart';
 
@@ -24,47 +25,7 @@ class HomeHivesList extends StatelessWidget {
                   itemCount: _hives.length,
                   itemBuilder: (context, index) {
                     var hive = _hives[index];
-                    return Container(
-                      decoration: BoxDecoration(
-                        border: Border.all(
-                          color: Theme.of(context).colorScheme.onBackground,
-                          width: 1,
-                          style: BorderStyle.solid,
-                        ),
-                        borderRadius: BorderRadius.circular(23),
-                        color: Colors.transparent,
-                      ),
-                      child: Row(
-                        children: [
-                          Column(
-                            children: [
-                              Text('وضعیت:' + hive.populationInfo.status),
-                              Text('آخرین بازدید:' +
-                                  hive.visits.first.date.toString())
-                            ],
-                          ),
-                          Text(
-                            hive.number.toString(),
-                            style: Theme.of(context).textTheme.headline4,
-                          ),
-                          hive.picture != null
-                              ? Container(
-                                  decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(55),
-                                      image: DecorationImage(
-                                          image:
-                                              FileImage(File(hive.picture)))))
-                              : Container(
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(55),
-                                  ),
-                                  child: Center(
-                                    child: Text('N/A'),
-                                  ),
-                                ),
-                        ],
-                      ),
-                    );
+                    return HomeHivesListItem(hive: hive);
                   });
             }
           } else if (snapshot.hasError) {
@@ -73,8 +34,92 @@ class HomeHivesList extends StatelessWidget {
               child: Text('خطا در بارگذاری'),
             );
           }
-          return _child;
+          return Padding(
+            padding: const EdgeInsets.all(12.0),
+            child: _child,
+          );
         });
+  }
+}
+
+class HomeHivesListItem extends StatelessWidget {
+  const HomeHivesListItem({
+    Key key,
+    @required this.hive,
+  }) : super(key: key);
+
+  final Hive hive;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.all(8),
+      decoration: BoxDecoration(
+        border: Border.all(
+          color: Theme.of(context).colorScheme.onBackground,
+          width: 1,
+          style: BorderStyle.solid,
+        ),
+        borderRadius: BorderRadius.circular(33),
+        color: Colors.transparent,
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          Column(
+            children: [
+              Text('وضعیت:' + hive.populationInfo.status),
+              Text('آخرین بازدید:' + hive.visits.first.date.toString())
+            ],
+          ),
+          Text(
+            hive.number.toString(),
+            style: Theme.of(context).textTheme.headline4,
+          ),
+          Align(
+              alignment: Alignment.centerRight,
+              child: this._showHivePicture(hive, context)),
+        ],
+      ),
+    );
+  }
+
+  Widget _showHivePicture(Hive hive, BuildContext context) {
+    if (hive.picture != null) {
+      return Container(
+        width: 60,
+        height: 60,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(55),
+          image: DecorationImage(
+            image: FileImage(
+              File(hive.picture),
+            ),
+          ),
+          border: Border.all(
+            color: Theme.of(context).colorScheme.onBackground,
+            width: 1,
+            style: BorderStyle.solid,
+          ),
+        ),
+      );
+    } else {
+      return Container(
+        width: 60,
+        height: 60,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(55),
+          border: Border.all(
+            color: Theme.of(context).colorScheme.onBackground,
+            width: 1,
+            style: BorderStyle.solid,
+          ),
+        ),
+        child: Center(
+          child: Text('N/A'),
+        ),
+      );
+    }
   }
 }
 
@@ -117,25 +162,14 @@ class HomeBottomNavigationBar extends StatelessWidget {
                   color: Theme.of(context).colorScheme.background,
                   elevation: 0,
                   highlightElevation: 0,
-                  onPressed: () {},
+                  onPressed: () => Navigator.of(context).pushNamed('addHive'),
                   child: Text('افزودن'),
                 ),
               ],
             ),
           ),
         ),
-        Container(
-          height: 80,
-          width: 80,
-          margin: EdgeInsets.only(bottom: 30),
-          child: MaterialButton(
-            onPressed: () {},
-            color: Colors.amber,
-            elevation: 20,
-            shape: StadiumBorder(),
-            child: Center(child: Text('VO')),
-          ),
-        ),
+        VoiceCommandButton(),
       ],
     );
   }

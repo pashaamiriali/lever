@@ -28,10 +28,12 @@ class HiveRepoImpl extends HiveRepo {
 
       PopulationInfo populationInfo = PopulationInfo.fromMap(rawPopulationInfo);
       QueenInfo queenInfo = QueenInfo.fromMap(rawQueenInfo);
-      rawRegularVisit['populationInfo'] = populationInfo.toMap();
-      RegularVisit regularVisit = RegularVisit.fromMap(rawRegularVisit);
-      rawChangeQueen['queenInfo'] = queenInfo.toMap();
-      ChangeQueen changeQueen = ChangeQueen.fromMap(rawChangeQueen);
+
+      RegularVisit regularVisit = RegularVisit.fromMap(
+          {...rawRegularVisit, 'populationInfo': populationInfo.toMap()});
+
+      ChangeQueen changeQueen = ChangeQueen.fromMap(
+          {...rawChangeQueen, 'queenInfo': queenInfo.toMap()});
 
       hivesList.add(generateHive(
           rawHive, populationInfo, queenInfo, regularVisit, changeQueen));
@@ -68,14 +70,17 @@ class HiveRepoImpl extends HiveRepo {
 
   Hive generateHive(rawHive, PopulationInfo populationInfo, QueenInfo queenInfo,
       RegularVisit regularVisit, ChangeQueen changeQueen) {
-    rawHive['populationInfo'] = populationInfo.toMap();
-    rawHive['queenInfo'] = queenInfo.toMap();
+    var newRawHive = {
+      ...rawHive,
+      'populationInfo': populationInfo.toMap(),
+      'queenInfo': queenInfo.toMap()
+    };
     return Hive(
-        rawHive['id'],
-        rawHive['number'],
-        rawHive['annualHoney'],
-        rawHive['description'],
-        rawHive['picture'],
+        newRawHive['id'],
+        newRawHive['number'],
+        newRawHive['annualHoney'],
+        newRawHive['description'],
+        newRawHive['picture'],
         populationInfo,
         queenInfo,
         [regularVisit, changeQueen]);
@@ -85,7 +90,7 @@ class HiveRepoImpl extends HiveRepo {
     var rawQueenInfo = await this._databaseWrapper.selectFirst({
       'table': 'queenInfos',
       'where': 'changeQueenId = ?',
-      'whereArgs':  [rawChangeQueen['id']]
+      'whereArgs': [rawChangeQueen['id']]
     });
     return rawQueenInfo;
   }
@@ -95,7 +100,7 @@ class HiveRepoImpl extends HiveRepo {
       'table': 'changeQueens',
       'where': 'hiveId = ?',
       'whereArgs': [rawHive['id']],
-      'orderBy': 'date DEC',
+      'orderBy': 'date DESC',
     });
     return rawChangeQueen;
   }
@@ -114,7 +119,7 @@ class HiveRepoImpl extends HiveRepo {
       'table': 'regularVisits',
       'where': 'hiveId = ?',
       'whereArgs': [rawHive['id']],
-      'orderBy': 'date DEC',
+      'orderBy': 'date DESC',
     });
     return rawRegularVisit;
   }
@@ -163,7 +168,7 @@ class HiveRepoImpl extends HiveRepo {
         regularVisitMap['tableData']['id'],
         regularVisitMap['tableData']['hiveId'],
         regularVisitMap['tableData']['date'],
-       json.decode( regularVisitMap['tableData']['pictures']),
+        json.decode(regularVisitMap['tableData']['pictures']),
         regularVisitMap['tableData']['description'],
         regularVisitMap['tableData']['behavior'],
         regularVisitMap['tableData']['queenSeen'],

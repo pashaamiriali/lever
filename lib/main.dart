@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:lever/core/dependency_management/injection/InjectorProvider.dart';
 import 'package:lever/core/dependency_management/injection/injector.dart';
+import 'package:lever/features/hive_management/presentation/screens/hive_add_screen.dart';
 import 'package:lever/features/home_screen/home_screen.dart';
 
 void main() async {
@@ -41,7 +42,10 @@ class MyApp extends StatelessWidget {
             onError: Colors.white,
           ),
         ),
-        routes: {'/': (BuildContext context) => HomeScreen()},
+        routes: {
+          '/': (BuildContext context) => HomeScreen(),
+          'addHive': (BuildContext context) => AddHiveView(),
+        },
       ),
     );
   }

@@ -207,7 +207,7 @@ void main() {
           'table': 'regularVisits',
           'where': 'hiveId = ?',
           'whereArgs': ['someId3234'],
-          'orderBy': 'date DEC'
+          'orderBy': 'date DESC'
         },
       ),
     ).thenAnswer((realInvocation) => {
@@ -241,7 +241,7 @@ void main() {
           'table': 'changeQueens',
           'where': 'hiveId = ?',
           'whereArgs':['someId3234'],
-          'orderBy': 'date DEC'
+          'orderBy': 'date DESC'
         },
       ),
     ).thenAnswer((realInvocation) => {
@@ -281,7 +281,7 @@ void main() {
         'table': 'regularVisits',
         'where': 'hiveId = ?',
         'whereArgs': ['someId3234'],
-        'orderBy': 'date DEC'
+        'orderBy': 'date DESC'
       };
       expect(verify(dbWrapper.selectFirst(captureAny)).captured[0], correctMap);
     });
@@ -304,7 +304,7 @@ void main() {
         'table': 'changeQueens',
         'where': 'hiveId = ?',
         'whereArgs': ['someId3234'],
-        'orderBy': 'date DEC'
+        'orderBy': 'date DESC'
       };
       expect(verify(dbWrapper.selectFirst(captureAny)).captured[2], correctMap);
     });
