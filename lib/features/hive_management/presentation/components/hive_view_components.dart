@@ -1,5 +1,10 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:lever/core/components/global_view_components.dart';
+import 'package:lever/core/dependency_management/injection/InjectorProvider.dart';
+import 'package:lever/core/dependency_management/injection/injector.dart';
+import 'package:lever/core/infrastructure/camera/take_picture_screen.dart';
 import 'package:lever/features/hive_management/presentation/logic/hive_add_view_logic.dart';
 
 class NotesSection extends StatelessWidget {
@@ -279,7 +284,7 @@ class HiveNumberSection extends StatelessWidget {
   }
 }
 
-class TakeImageSection extends StatelessWidget {
+class TakeImageSection extends StatefulWidget {
   final AddHiveViewLogic model;
   const TakeImageSection({
     Key key,
@@ -287,7 +292,14 @@ class TakeImageSection extends StatelessWidget {
   }) : super(key: key);
 
   @override
+  _TakeImageSectionState createState() => _TakeImageSectionState();
+}
+
+class _TakeImageSectionState extends State<TakeImageSection> {
+  File _picture;
+  @override
   Widget build(BuildContext context) {
+    Injector _injector = InjectorProvider.of(context).injector;
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
@@ -299,14 +311,23 @@ class TakeImageSection extends StatelessWidget {
                   color: Theme.of(context).colorScheme.onBackground,
                   width: 1,
                   style: BorderStyle.solid),
-              borderRadius: BorderRadius.circular(200)),
+              borderRadius: BorderRadius.circular(200),
+              image: _picture != null
+                  ? DecorationImage(
+                      image: FileImage(_picture), fit: BoxFit.cover)
+                  : null),
           child: Center(
-            child: Text('img'),
+            child: _picture == null ? Text('خالی') : Container(),
           ),
         ),
         MaterialButton(
           onPressed: () {
-            //TODO: implement onpressed
+            Navigator.of(context).push(MaterialPageRoute(
+                builder: (context) => TakePictureScreen(
+                      camera: _injector.camera,
+                      captureMode: CaptureMode.forHive,
+                      hivePictureTakenCallback: imageCapturedCallback,
+                    )));
           },
           child: Text('گرفتن عکس'),
           elevation: 0,
@@ -315,5 +336,12 @@ class TakeImageSection extends StatelessWidget {
         ),
       ],
     );
+  }
+
+  void imageCapturedCallback(String imagePath) {
+    setState(() {
+      this._picture = File(imagePath);
+      widget.model.picture = imagePath;
+    });
   }
 }

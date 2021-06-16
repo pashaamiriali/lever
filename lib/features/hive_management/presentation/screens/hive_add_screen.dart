@@ -67,8 +67,8 @@ class AddHiveView extends StatelessWidget {
               ),
               BottomButtonSet(
                 onBackPressed: () => Navigator.of(context).pop(),
-                rightActionChild: Center(child: Text('save')),
-                rightAction: () {},
+                rightActionChild: Center(child: Icon(Icons.check)),
+                rightAction: () =>model.saveHivePressed,
               )
             ],
           ),

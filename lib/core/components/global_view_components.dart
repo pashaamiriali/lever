@@ -14,10 +14,15 @@ class VoiceCommandButton extends StatelessWidget {
       margin: EdgeInsets.only(bottom: 30),
       child: MaterialButton(
         onPressed: () {},
-        color: Colors.amber,
+        color: Theme.of(context).colorScheme.secondary,
+        textColor: Theme.of(context).colorScheme.onSecondary,
         elevation: 20,
         shape: StadiumBorder(),
-        child: Center(child: Text('VO')),
+        child: Center(
+            child: Icon(
+          Icons.mic_rounded,
+          size: 36,
+        )),
       ),
     );
   }
@@ -40,23 +45,20 @@ class BottomButtonSet extends StatelessWidget {
     return Align(
       alignment: Alignment.bottomCenter,
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          Transform.translate(
-            offset: Offset(0, 20),
-            child: Align(
-              alignment: Alignment.bottomLeft,
-              child: Container(
-                height: 60,
-                width: 60,
-                margin: EdgeInsets.only(bottom: 30),
-                child: MaterialButton(
-                  onPressed: () => onBackPressed,
-                  color: Colors.grey,
-                  elevation: 20,
-                  shape: StadiumBorder(),
-                  child: Center(child: Icon(Icons.arrow_back)),
-                ),
+          Align(
+            alignment: Alignment.bottomLeft,
+            child: Container(
+              height: 40,
+              width: 80,
+              margin: EdgeInsets.only(bottom: 30),
+              child: MaterialButton(
+                onPressed: () => onBackPressed.call(),
+                color: Theme.of(context).colorScheme.surface,
+                elevation: 10,
+                shape: StadiumBorder(),
+                child: Center(child: Icon(Icons.arrow_back)),
               ),
             ),
           ),
@@ -71,9 +73,10 @@ class BottomButtonSet extends StatelessWidget {
               width: 60,
               margin: EdgeInsets.only(bottom: 30),
               child: MaterialButton(
-                  onPressed: rightAction,
-                  color: Colors.grey,
-                  elevation: 20,
+                  onPressed: rightAction.call(),
+                  color: Theme.of(context).colorScheme.primary,
+                  textColor: Theme.of(context).colorScheme.onPrimary,
+                  elevation: 15,
                   shape: StadiumBorder(),
                   child: rightActionChild),
             ),

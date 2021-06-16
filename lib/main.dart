@@ -20,6 +20,8 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    var textColor = Colors.blueGrey[900];
+    var background = Colors.white;
     return InjectorProvider(
       injector: this.injector,
       child: MaterialApp(
@@ -30,16 +32,16 @@ class MyApp extends StatelessWidget {
             brightness: Brightness.light,
             primary: Colors.indigo,
             primaryVariant: Colors.deepPurple,
-            onPrimary: Colors.white,
+            onPrimary: background,
             secondary: Colors.amber,
             secondaryVariant: Colors.yellow,
-            onSecondary: Colors.black54,
-            surface: Colors.white,
-            onSurface: Colors.black54,
-            background: Colors.white,
-            onBackground: Colors.black54,
+            onSecondary: textColor,
+            surface: background,
+            onSurface: textColor,
+            background: background,
+            onBackground: textColor,
             error: Colors.red,
-            onError: Colors.white,
+            onError: background,
           ),
         ),
         routes: {

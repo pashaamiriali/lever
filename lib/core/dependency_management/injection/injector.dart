@@ -1,3 +1,4 @@
+import 'package:camera/camera.dart';
 import 'package:lever/core/env.dart';
 import 'package:lever/core/infrastructure/data/database_initializer.dart';
 import 'package:lever/core/infrastructure/data/database_provider.dart';
@@ -18,14 +19,16 @@ class Injector {
   IDGen _idGen;
   DateTimeProvider _datetimeProvider;
   HiveRepoImpl _hiveRepoImpl;
+  CameraDescription camera;
   Future initiate() async {
-    this._db=await _instantiateDb();
+    this._db = await _instantiateDb();
     this._uuid = Uuid();
     this._dbWrapper = DatabaseWrapperImpl(this._db);
     this._idGen = IDGenImpl(_uuid);
     this._datetimeProvider = DateTimeProviderImpl();
     this._hiveRepoImpl =
         HiveRepoImpl(this._dbWrapper, this._idGen, this._datetimeProvider);
+    this.camera = (await availableCameras()).first;
   }
 
   Future<Database> _instantiateDb() async {

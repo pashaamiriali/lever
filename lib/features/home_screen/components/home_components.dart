@@ -143,8 +143,12 @@ class HomeBottomNavigationBar extends StatelessWidget {
                 color: Theme.of(context).colorScheme.background,
                 boxShadow: [
                   BoxShadow(
-                      color: Theme.of(context).colorScheme.onBackground,
-                      blurRadius: 5)
+                      color: Theme.of(context)
+                          .colorScheme
+                          .onBackground
+                          .withOpacity(0.4),
+                      blurRadius: 12,
+                      spreadRadius: 1)
                 ]),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
