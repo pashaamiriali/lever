@@ -8,6 +8,7 @@ import 'package:lever/core/infrastructure/data/id_generator.dart';
 import 'package:lever/features/hive_management/data/hive_repo_impl.dart';
 import 'package:lever/features/hive_management/domain/usecases/add_hive_cmnd.dart';
 import 'package:lever/features/hive_management/domain/usecases/fetch_hives_cmnd.dart';
+import 'package:lever/features/hive_management/domain/usecases/generate_hive_number_cmnd.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:uuid/uuid.dart';
@@ -43,4 +44,6 @@ class Injector {
 
   AddHiveCmnd get getAddHiveCmnd => AddHiveCmnd(this._hiveRepoImpl);
   FetchHivesCmnd get getFetchHivesCmnd => FetchHivesCmnd(this._hiveRepoImpl);
+  GenerateHiveNumberCmnd get getGenerateHiveNumberCmnd =>
+      GenerateHiveNumberCmnd(this._hiveRepoImpl);
 }

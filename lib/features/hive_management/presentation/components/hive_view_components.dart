@@ -259,26 +259,27 @@ class HiveNumberSection extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
         InputTitle(text: 'شماره کندو'),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: [
-            MaterialButton(
-              onPressed: () {
-                //TODO: implement onpressed
-              },
-              child: Text('تولید شماره'),
-              elevation: 0,
-              focusElevation: 0,
-              shape: StadiumBorder(),
-            ),
-            CustomTextField(
-              widthInPercent: 0.4,
-              hintText: 'وارد کنید',
-              controller: TextEditingController(),
-              inputType: TextInputType.number,
-            ),
-          ],
-        ),
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: FutureBuilder<int>(
+              future: model.generateHiveNumber(),
+              builder: (context, snapshot) {
+                var theme = Theme.of(context);
+                if (snapshot.hasData)
+                  return Center(
+                    child: Text(snapshot.data.toString()),
+                  );
+                else if (snapshot.hasError)
+                  return Center(
+                    child: Text(
+                      'خطا در تولید شماره',
+                      style: theme.textTheme.headline6
+                          .copyWith(color: theme.colorScheme.error),
+                    ),
+                  );
+                return Center(child: CircularProgressIndicator());
+              }),
+        )
       ],
     );
   }

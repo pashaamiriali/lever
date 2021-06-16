@@ -280,4 +280,14 @@ class HiveRepoImpl extends HiveRepo {
     this._databaseWrapper.insert(regularVisitMap);
     return regularVisitMap;
   }
+
+  @override
+  Future<int> fetchLastHiveNumber() async {
+    var rawHive = await this._databaseWrapper.selectFirst({
+      'table': 'hives',
+      'orderBy': 'number DESC',
+    });
+    if (rawHive == null) return null;
+    return rawHive['number'];
+  }
 }

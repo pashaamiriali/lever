@@ -12,8 +12,9 @@ class DatabaseWrapperImpl implements DatabaseWrapper {
   }
 
   @override
-  Future<List<Map<String,dynamic>>> select(Map<String, dynamic> selectInfo) async {
-  return await _db.query(selectInfo['table']);
+  Future<List<Map<String, dynamic>>> select(
+      Map<String, dynamic> selectInfo) async {
+    return await _db.query(selectInfo['table']);
   }
 
   @override
@@ -24,6 +25,7 @@ class DatabaseWrapperImpl implements DatabaseWrapper {
         whereArgs: selectInfo['whereArgs'],
         orderBy: selectInfo['orderBy'],
         limit: 1);
+    if (result.isEmpty) return null;
     return result[0];
   }
 }

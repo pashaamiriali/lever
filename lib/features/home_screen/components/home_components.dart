@@ -166,7 +166,7 @@ class HomeBottomNavigationBar extends StatelessWidget {
                   color: Theme.of(context).colorScheme.background,
                   elevation: 0,
                   highlightElevation: 0,
-                  onPressed: () => Navigator.of(context).pushNamed('addHive'),
+                  onPressed: () => Navigator.of(context).pushReplacementNamed('addHive'),
                   child: Text('افزودن'),
                 ),
               ],

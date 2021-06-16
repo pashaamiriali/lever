@@ -15,12 +15,13 @@ class MockIDGen extends Mock implements IDGen {}
 class MockDateTimeProvider extends Mock implements DateTimeProvider {}
 
 void main() {
-  MockDatabaseWrapper dbWrapper = MockDatabaseWrapper();
-  MockIDGen idGen = MockIDGen();
-  MockDateTimeProvider dateTimeProvider = MockDateTimeProvider();
-  var currentDateTime = DateTime.now();
-  when(dateTimeProvider.getCurrentDateTime()).thenReturn(currentDateTime);
   group('saveHive', () {
+    MockDatabaseWrapper dbWrapper = MockDatabaseWrapper();
+    MockIDGen idGen = MockIDGen();
+    MockDateTimeProvider dateTimeProvider = MockDateTimeProvider();
+    var currentDateTime = DateTime.now();
+    when(dateTimeProvider.getCurrentDateTime()).thenReturn(currentDateTime);
+
     test('should call insert (for hive) with proper mapped value', () {
       HiveRepoImpl impl = HiveRepoImpl(dbWrapper, idGen, dateTimeProvider);
       var properHiveMap = {
@@ -192,6 +193,12 @@ void main() {
     });
   });
   group('fetchHives', () {
+    MockDatabaseWrapper dbWrapper = MockDatabaseWrapper();
+    MockIDGen idGen = MockIDGen();
+    MockDateTimeProvider dateTimeProvider = MockDateTimeProvider();
+    var currentDateTime = DateTime.now();
+    when(dateTimeProvider.getCurrentDateTime()).thenReturn(currentDateTime);
+
     when(dbWrapper.select({'table': 'hives'})).thenAnswer((realInvocation) => [
           {
             'id': 'someId3234',
@@ -225,7 +232,7 @@ void main() {
         {
           'table': 'populationInfos',
           'where': 'regularVisitId = ?',
-          'whereArgs':['someId3234'],
+          'whereArgs': ['someId3234'],
         },
       ),
     ).thenAnswer((realInvocation) => {
@@ -240,7 +247,7 @@ void main() {
         {
           'table': 'changeQueens',
           'where': 'hiveId = ?',
-          'whereArgs':['someId3234'],
+          'whereArgs': ['someId3234'],
           'orderBy': 'date DESC'
         },
       ),
@@ -248,7 +255,7 @@ void main() {
           'id': 'someId3234',
           'hiveId': 'someId3234',
           'date': currentDateTime,
-          'pictures': json.encode(['picturePath1', 'picturePath2']) ,
+          'pictures': json.encode(['picturePath1', 'picturePath2']),
           'description': 'some desc',
         });
     when(
@@ -292,7 +299,7 @@ void main() {
       var correctMap = {
         'table': 'populationInfos',
         'where': 'regularVisitId = ?',
-        'whereArgs':['someId3234']
+        'whereArgs': ['someId3234']
       };
       expect(verify(dbWrapper.selectFirst(captureAny)).captured[1], correctMap);
     });
@@ -355,6 +362,68 @@ void main() {
       ];
       List<Hive> result = await impl.fetchHives();
       expect(result[0].toMap(), correctHivesList[0].toMap());
+    });
+  });
+  group('fetchLastHiveNumber', () {
+    MockDatabaseWrapper dbWrapper = MockDatabaseWrapper();
+    MockIDGen idGen = MockIDGen();
+    MockDateTimeProvider dateTimeProvider = MockDateTimeProvider();
+    var currentDateTime = DateTime.now();
+    when(dateTimeProvider.getCurrentDateTime()).thenReturn(currentDateTime);
+
+    var correctPopulationInfo =
+        PopulationInfo('someId3234', 'someId3234', 20, 2, 'strong');
+    var correctQueenInfo = QueenInfo('someId3234', 'someId3234',
+        currentDateTime, 'some breed name', 'purple');
+    var correctRegularVisit = RegularVisit(
+        'someId3234',
+        'someId3234',
+        currentDateTime,
+        ['picturePath1', 'picturePath2'],
+        'some desc',
+        'calm',
+        true,
+        'good',
+        correctPopulationInfo);
+    var correctChangeQueen = ChangeQueen(
+        'someId3234',
+        'someId3234',
+        currentDateTime,
+        ['picturePath1', 'picturePath2'],
+        'some desc',
+        correctQueenInfo);
+    var correctHive = Hive(
+        'someId3234',
+        1234,
+        34,
+        'some desc',
+        'picturePath',
+        correctPopulationInfo,
+        correctQueenInfo,
+        [correctRegularVisit, correctChangeQueen]);
+    test('should call select with proper arguments', () async {
+      HiveRepoImpl impl = HiveRepoImpl(dbWrapper, idGen, dateTimeProvider);
+      var correctMap = {'table': 'hives', 'orderBy': 'number DESC'};
+      when(dbWrapper.selectFirst(correctMap))
+          .thenAnswer((realInvocation) async => correctHive.toMap());
+    await impl.fetchLastHiveNumber();
+      expect(verify(dbWrapper.selectFirst(captureAny)).captured[0], correctMap);
+    });
+    test('should return the hive number', () async {
+           HiveRepoImpl impl = HiveRepoImpl(dbWrapper, idGen, dateTimeProvider);
+      var correctMap = {'table': 'hives', 'orderBy': 'number DESC'};
+      when(dbWrapper.selectFirst(correctMap))
+          .thenAnswer((realInvocation) async => correctHive.toMap());
+      var result = await impl.fetchLastHiveNumber();
+      expect(result,correctHive.number);
+    });
+    test('should return null when the result is null', () async {
+           HiveRepoImpl impl = HiveRepoImpl(dbWrapper, idGen, dateTimeProvider);
+      var correctMap = {'table': 'hives', 'orderBy': 'number DESC'};
+      when(dbWrapper.selectFirst(correctMap))
+          .thenAnswer((realInvocation) async => null);
+      var result = await impl.fetchLastHiveNumber();
+      expect(result,null);
     });
   });
 }

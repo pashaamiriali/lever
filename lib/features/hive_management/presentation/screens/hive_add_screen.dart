@@ -13,7 +13,8 @@ class AddHiveView extends StatelessWidget {
     var _injector = InjectorProvider.of(context).injector;
     return Scaffold(
       body: ChangeNotifierProvider<AddHiveViewLogic>(
-        create: (context) => AddHiveViewLogic(_injector.getAddHiveCmnd),
+        create: (context) => AddHiveViewLogic(
+            _injector.getAddHiveCmnd, _injector.getGenerateHiveNumberCmnd),
         child: Consumer<AddHiveViewLogic>(
           builder: (__, model, _) => Stack(
             children: [
@@ -66,9 +67,10 @@ class AddHiveView extends StatelessWidget {
                 ),
               ),
               BottomButtonSet(
-                onBackPressed: () => Navigator.of(context).pop(),
+                onBackPressed: () =>
+                    Navigator.of(context).pushReplacementNamed('/'),
                 rightActionChild: Center(child: Icon(Icons.check)),
-                rightAction: () =>model.saveHivePressed,
+                rightAction: () => model.saveHivePressed,
               )
             ],
           ),

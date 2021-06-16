@@ -1,10 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:lever/features/hive_management/domain/entities/entities.dart';
+import 'package:lever/features/hive_management/domain/usecases/generate_hive_number_cmnd.dart';
 import 'package:lever/features/hive_management/domain/usecases/usecases.dart';
 
 class AddHiveViewLogic with ChangeNotifier {
   final AddHiveCmnd _addHiveCmnd;
-  AddHiveViewLogic(this._addHiveCmnd);
+  final GenerateHiveNumberCmnd _generateHiveNumberCmnd;
+  AddHiveViewLogic(this._addHiveCmnd, this._generateHiveNumberCmnd);
   bool isSaveButtonPressed = false;
   bool formValidated = false;
   bool isLoading = false;
@@ -29,6 +31,10 @@ class AddHiveViewLogic with ChangeNotifier {
     } else
       isSaveButtonPressed = true;
     notifyListeners();
+  }
+
+  Future<int> generateHiveNumber() async {
+    return hiveNumber = await _generateHiveNumberCmnd.execute(null);
   }
 
   Future<Hive> addHive(

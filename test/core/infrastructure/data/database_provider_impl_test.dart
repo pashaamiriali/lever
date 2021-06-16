@@ -67,6 +67,27 @@ void main() {
           orderBy: 'date DEC'));
       expect(result, expectedMap);
     });
+    test('should return null when the database returns empty', () async {
+      var queryMap = {
+        'table': 'regularVisits',
+        'where': 'hiveId = ?',
+        'whereArgs': ['someId3234'],
+        'orderBy': 'date DEC'
+      };
+      when(mockDatabase.query(queryMap['table'],
+              where: 'hiveId = ?',
+              whereArgs: ['someId3234'],
+              limit: 1,
+              orderBy: 'date DEC'))
+          .thenAnswer((realInvocation) async => []);
+      var result = await dbWrapperImpl.selectFirst(queryMap);
+      verify(mockDatabase.query(queryMap['table'],
+          where: 'hiveId = ?',
+          whereArgs: ['someId3234'],
+          limit: 1,
+          orderBy: 'date DEC'));
+      expect(result, null);
+    });
   });
   group('select', () {
     MockDatabase mockDatabase = MockDatabase();
