@@ -12,15 +12,22 @@ class ChangeQueen extends Visit {
 
   static ChangeQueen fromMap(Map<String, dynamic> map) {
     if (map == null) return null;
-    return ChangeQueen(map['id'], map['hiveId'], map['date'],  (json.decode(map['pictures']) as List<dynamic>).cast<String>(),
-        map['description'], QueenInfo.fromMap(map['queenInfo']));
+    return ChangeQueen(
+        map['id'],
+        map['hiveId'],
+        map['date'] == null
+            ? null
+            : DateTime.fromMillisecondsSinceEpoch(map['date']),
+        (json.decode(map['pictures']) as List<dynamic>).cast<String>(),
+        map['description'],
+        QueenInfo.fromMap(map['queenInfo']));
   }
 
   Map<String, dynamic> toMap() {
     return {
       'id': this.id,
       'hiveId': this.hiveId,
-      'date': this.date,
+      'date': this.date.millisecondsSinceEpoch,
       'pictures': json.encode(this.pictures),
       'description': this.description,
       'queenInfo': this.queenInfo?.toMap()

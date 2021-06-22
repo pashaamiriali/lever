@@ -1,10 +1,9 @@
 import 'package:camera/camera.dart';
 import 'package:lever/core/env.dart';
 import 'package:lever/core/infrastructure/data/database_initializer.dart';
-import 'package:lever/core/infrastructure/data/database_provider.dart';
-import 'package:lever/core/infrastructure/data/database_provider_impl.dart';
 import 'package:lever/core/infrastructure/data/date_time_provider.dart';
 import 'package:lever/core/infrastructure/data/id_generator.dart';
+import 'package:lever/core/infrastructure/data/moor_db/app_database.dart';
 import 'package:lever/features/hive_management/data/hive_repo_impl.dart';
 import 'package:lever/features/hive_management/domain/usecases/add_hive_cmnd.dart';
 import 'package:lever/features/hive_management/domain/usecases/fetch_hives_cmnd.dart';
@@ -16,7 +15,7 @@ import 'package:uuid/uuid.dart';
 class Injector {
   Database _db;
   Uuid _uuid;
-  DatabaseWrapper _dbWrapper;
+  AppDatabase _appDatabase;
   IDGen _idGen;
   DateTimeProvider _datetimeProvider;
   HiveRepoImpl _hiveRepoImpl;
@@ -24,11 +23,11 @@ class Injector {
   Future initiate() async {
     this._db = await _instantiateDb();
     this._uuid = Uuid();
-    this._dbWrapper = DatabaseWrapperImpl(this._db);
+    this._appDatabase = AppDatabase();
     this._idGen = IDGenImpl(_uuid);
     this._datetimeProvider = DateTimeProviderImpl();
     this._hiveRepoImpl =
-        HiveRepoImpl(this._dbWrapper, this._idGen, this._datetimeProvider);
+        HiveRepoImpl(this._appDatabase, this._idGen, this._datetimeProvider);
     this.camera = (await availableCameras()).first;
   }
 

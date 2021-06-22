@@ -73,7 +73,7 @@ class BottomButtonSet extends StatelessWidget {
               width: 60,
               margin: EdgeInsets.only(bottom: 30),
               child: MaterialButton(
-                  onPressed: rightAction.call(),
+                  onPressed: rightAction,
                   color: Theme.of(context).colorScheme.primary,
                   textColor: Theme.of(context).colorScheme.onPrimary,
                   elevation: 15,

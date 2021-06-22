@@ -26,14 +26,14 @@ void main() {
       var expectedMap = {
         'id': 'someId1234',
         'changeQueenId': 'someId1234',
-        'enterDate': DateTime.now(),
+        'enterDate': DateTime.now().millisecondsSinceEpoch,
         'breed': 'some breed name',
         'backColor': 'red'
       };
       var result = QueenInfo(
               expectedMap['id'],
               expectedMap['changeQueenId'],
-              expectedMap['enterDate'],
+              DateTime.fromMillisecondsSinceEpoch(expectedMap['enterDate']),
               expectedMap['breed'],
               expectedMap['backColor'])
           .toMap();
@@ -43,7 +43,7 @@ void main() {
       var expectedMap = {
         'id': 'someId1234',
         'hiveId': 'someId1234',
-        'date': DateTime.now(),
+        'date': DateTime.now().millisecondsSinceEpoch,
         'pictures': json.encode(['picturePath']),
         'description': 'someDesc',
         'behavior': 'calm',
@@ -54,7 +54,7 @@ void main() {
       var result = RegularVisit(
               expectedMap['id'],
               expectedMap['hiveId'],
-              expectedMap['date'],
+              DateTime.fromMillisecondsSinceEpoch(expectedMap['date']),
               (json.decode(expectedMap['pictures']) as List<dynamic>)
                   .cast<String>(),
               expectedMap['description'],
@@ -69,7 +69,7 @@ void main() {
       var expectedMap = {
         'id': 'someId1234',
         'hiveId': 'someId1234',
-        'date': DateTime.now(),
+        'date': DateTime.now().millisecondsSinceEpoch,
         'pictures': json.encode(['picturePath']),
         'description': 'someDesc',
         'queenInfo': null,
@@ -77,7 +77,7 @@ void main() {
       var result = ChangeQueen(
               expectedMap['id'],
               expectedMap['hiveId'],
-              expectedMap['date'],
+              DateTime.fromMillisecondsSinceEpoch(expectedMap['date']),
               (json.decode(expectedMap['pictures']) as List<dynamic>)
                   .cast<String>(),
               expectedMap['description'],
@@ -89,7 +89,7 @@ void main() {
       var expectedMap = {
         'id': 'someId1234',
         'hiveId': 'someId1234',
-        'date': DateTime.now(),
+        'date': DateTime.now().millisecondsSinceEpoch,
         'pictures': json.encode(['picturePath']),
         'description': 'someDesc',
         'describedAmount': 'good',
@@ -100,7 +100,7 @@ void main() {
       var result = HarvestHoney(
               expectedMap['id'],
               expectedMap['hiveId'],
-              expectedMap['date'],
+              DateTime.fromMillisecondsSinceEpoch(expectedMap['date']),
               (json.decode(expectedMap['pictures']) as List<dynamic>)
                   .cast<String>(),
               expectedMap['description'],
@@ -115,14 +115,14 @@ void main() {
       var expectedMap = {
         'id': 'someId1234',
         'hiveId': 'someId1234',
-        'date': DateTime.now(),
+        'date': DateTime.now().millisecondsSinceEpoch,
         'pictures': json.encode(['picturePath']),
         'description': 'someDesc',
       };
       var result = Visit(
         expectedMap['id'],
         expectedMap['hiveId'],
-        expectedMap['date'],
+        DateTime.fromMillisecondsSinceEpoch(expectedMap['date']),
         (json.decode(expectedMap['pictures']) as List<dynamic>).cast<String>(),
         expectedMap['description'],
       ).toMap();
@@ -171,7 +171,7 @@ void main() {
       var expectedMap = {
         'id': 'someId1234',
         'changeQueenId': 'someId1234',
-        'enterDate': DateTime.now(),
+        'enterDate': DateTime.now().millisecondsSinceEpoch,
         'breed': 'some breed name',
         'backColor': 'red'
       };
@@ -184,7 +184,7 @@ void main() {
       var expectedMap = {
         'id': 'someId1234',
         'hiveId': 'someId1234',
-        'date': DateTime.now(),
+        'date': DateTime.now().millisecondsSinceEpoch,
         'pictures': json.encode(['picturePath']),
         'description': 'someDesc',
         'behavior': 'calm',
@@ -201,7 +201,7 @@ void main() {
       var expectedMap = {
         'id': 'someId1234',
         'hiveId': 'someId1234',
-        'date': DateTime.now(),
+        'date': DateTime.now().millisecondsSinceEpoch,
         'pictures': json.encode(['picturePath']),
         'description': 'someDesc',
         'queenInfo': null,
@@ -215,7 +215,7 @@ void main() {
       var expectedMap = {
         'id': 'someId1234',
         'hiveId': 'someId1234',
-        'date': DateTime.now(),
+        'date': DateTime.now().millisecondsSinceEpoch,
         'pictures': json.encode(['picturePath']),
         'description': 'someDesc',
         'describedAmount': 'good',
@@ -230,7 +230,7 @@ void main() {
       var expectedMap = {
         'id': 'someId1234',
         'hiveId': 'someId1234',
-        'date': DateTime.now(),
+        'date': DateTime.now().millisecondsSinceEpoch,
         'pictures': json.encode(['picturePath']),
         'description': 'someDesc',
       };

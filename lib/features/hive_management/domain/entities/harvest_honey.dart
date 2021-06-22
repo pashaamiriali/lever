@@ -25,7 +25,9 @@ class HarvestHoney extends Visit {
     return HarvestHoney(
         map['id'],
         map['hiveId'],
-        map['date'],
+       map['date'] == null
+            ? null
+            : DateTime.fromMillisecondsSinceEpoch(map['date']),
         (json.decode(map['pictures']) as List<dynamic>).cast<String>(),
         map['description'],
         map['describedAmount'],
@@ -38,7 +40,7 @@ class HarvestHoney extends Visit {
     return {
       'id': this.id,
       'hiveId': this.hiveId,
-      'date': this.date,
+      'date': this.date.millisecondsSinceEpoch,
       'pictures': json.encode(this.pictures),
       'description': this.description,
       'describedAmount': this.describedAmount,

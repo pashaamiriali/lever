@@ -1,8 +1,8 @@
 import 'dart:convert';
 
-import 'package:lever/core/infrastructure/data/database_provider.dart';
 import 'package:lever/core/infrastructure/data/date_time_provider.dart';
 import 'package:lever/core/infrastructure/data/id_generator.dart';
+import 'package:lever/core/infrastructure/data/moor_db/app_database.dart';
 import 'package:lever/features/hive_management/domain/data/hive_repo.dart';
 import 'package:lever/features/hive_management/domain/entities/entities.dart';
 import 'package:lever/features/hive_management/domain/entities/hive.dart';
@@ -10,284 +10,179 @@ import 'package:lever/features/hive_management/domain/entities/population_info.d
 import 'package:lever/features/hive_management/domain/entities/queen_info.dart';
 
 class HiveRepoImpl extends HiveRepo {
-  final DatabaseWrapper _databaseWrapper;
+  final AppDatabase _appDatabase;
   final IDGen _idGen;
   final DateTimeProvider _dateTimeProvider;
 
-  HiveRepoImpl(this._databaseWrapper, this._idGen, this._dateTimeProvider);
+  HiveRepoImpl(this._appDatabase, this._idGen, this._dateTimeProvider);
 
   @override
   Future<List<Hive>> fetchHives() async {
     List<Hive> hivesList = [];
-    var rawHives = await this._databaseWrapper.select({'table': 'hives'});
-    for (var rawHive in rawHives) {
-      var rawRegularVisit = await fetchLastRegularVisit(rawHive);
-      var rawPopulationInfo = await fetchLastPopulationInfo(rawRegularVisit);
-      var rawChangeQueen = await fetchLastChangeQueen(rawHive);
-      var rawQueenInfo = await fetchLastQueenInfo(rawChangeQueen);
-
-      PopulationInfo populationInfo = PopulationInfo.fromMap(rawPopulationInfo);
-      QueenInfo queenInfo = QueenInfo.fromMap(rawQueenInfo);
-
-      RegularVisit regularVisit = RegularVisit.fromMap(
-          {...rawRegularVisit, 'populationInfo': populationInfo.toMap()});
-
-      ChangeQueen changeQueen = ChangeQueen.fromMap(
-          {...rawChangeQueen, 'queenInfo': queenInfo.toMap()});
-
-      hivesList.add(generateHive(
-          rawHive, populationInfo, queenInfo, regularVisit, changeQueen));
-    }
+    var rawHives = await this._appDatabase.allHives;
+    rawHives.map((e) async {
+      hivesList.add(Hive(
+          e.id,
+          e.number,
+          e.annualHoney,
+          e.description,
+          e.picture,
+          await getHivePopulationInfo(e.id),
+          await getHiveQueenInfo(e.id),
+          await getHiveVisits(e.id)));
+    }).toList();
     return hivesList;
   }
 
   @override
-  Future<Hive> saveHive(
-      Hive hive, PopulationInfo populationInfo, QueenInfo queenInfo) async {
-    var hiveId = insertHive(hive);
-    var regularVisitId = this._idGen.generateId();
-    var regularVisitMap = insertRegularVisit(hiveId, regularVisitId);
-    Map<String, dynamic> populationInfoMap =
-        insertPopulationInfo(regularVisitId, populationInfo);
-    var changeQueenId = this._idGen.generateId();
-    Map<String, dynamic> changeQueenMap =
-        insertChangeQueen(changeQueenId, hiveId);
-    Map<String, dynamic> queenInfoMap =
-        insertQueenInfo(changeQueenId, queenInfo);
-
-    return generateReturnValues(
-        populationInfoMap,
-        regularVisitId,
-        populationInfo,
-        queenInfoMap,
-        changeQueenId,
-        queenInfo,
-        regularVisitMap,
-        changeQueenMap,
-        hiveId,
-        hive);
-  }
-
-  Hive generateHive(rawHive, PopulationInfo populationInfo, QueenInfo queenInfo,
-      RegularVisit regularVisit, ChangeQueen changeQueen) {
-    var newRawHive = {
-      ...rawHive,
-      'populationInfo': populationInfo.toMap(),
-      'queenInfo': queenInfo.toMap()
-    };
-    return Hive(
-        newRawHive['id'],
-        newRawHive['number'],
-        newRawHive['annualHoney'],
-        newRawHive['description'],
-        newRawHive['picture'],
-        populationInfo,
-        queenInfo,
-        [regularVisit, changeQueen]);
-  }
-
-  Future<dynamic> fetchLastQueenInfo(rawChangeQueen) async {
-    var rawQueenInfo = await this._databaseWrapper.selectFirst({
-      'table': 'queenInfos',
-      'where': 'changeQueenId = ?',
-      'whereArgs': [rawChangeQueen['id']]
-    });
-    return rawQueenInfo;
-  }
-
-  Future<dynamic> fetchLastChangeQueen(rawHive) async {
-    var rawChangeQueen = await this._databaseWrapper.selectFirst({
-      'table': 'changeQueens',
-      'where': 'hiveId = ?',
-      'whereArgs': [rawHive['id']],
-      'orderBy': 'date DESC',
-    });
-    return rawChangeQueen;
-  }
-
-  Future<dynamic> fetchLastPopulationInfo(rawRegularVisit) async {
-    var rawPopulationInfo = await this._databaseWrapper.selectFirst({
-      'table': 'populationInfos',
-      'where': 'regularVisitId = ?',
-      'whereArgs': [rawRegularVisit['id']],
-    });
-    return rawPopulationInfo;
-  }
-
-  Future<dynamic> fetchLastRegularVisit(rawHive) async {
-    var rawRegularVisit = await this._databaseWrapper.selectFirst({
-      'table': 'regularVisits',
-      'where': 'hiveId = ?',
-      'whereArgs': [rawHive['id']],
-      'orderBy': 'date DESC',
-    });
-    return rawRegularVisit;
-  }
-
-  Hive generateReturnValues(
-      Map<String, dynamic> populationInfoMap,
-      regularVisitId,
-      PopulationInfo populationInfo,
-      Map<String, dynamic> queenInfoMap,
-      changeQueenId,
-      QueenInfo queenInfo,
-      regularVisitMap,
-      Map<String, dynamic> changeQueenMap,
-      hiveId,
-      Hive hive) {
-    PopulationInfo returnPopulationInfo = generateReturnPopulationInfo(
-        populationInfoMap, regularVisitId, populationInfo);
-    QueenInfo returnQueenInfo =
-        generateReturnQueenInfo(queenInfoMap, changeQueenId, queenInfo);
-    RegularVisit returnRegularVisit =
-        generateReturnRegularVisit(regularVisitMap, populationInfo);
-    ChangeQueen returnChangeQueen =
-        generateReturnChangeQueen(changeQueenMap, returnQueenInfo);
-    return Hive(hiveId, hive.number, hive.annualHoney, hive.description,
-        hive.picture, returnPopulationInfo, returnQueenInfo, [
-      returnRegularVisit,
-      returnChangeQueen,
-    ]);
-  }
-
-  ChangeQueen generateReturnChangeQueen(
-      Map<String, dynamic> changeQueenMap, QueenInfo returnQueenInfo) {
-    var returnChangeQueen = ChangeQueen(
-        changeQueenMap['tableData']['id'],
-        changeQueenMap['tableData']['hiveId'],
-        changeQueenMap['tableData']['date'],
-        json.decode(changeQueenMap['tableData']['pictures']),
-        changeQueenMap['tableData']['descriptions'],
-        returnQueenInfo);
-    return returnChangeQueen;
-  }
-
-  RegularVisit generateReturnRegularVisit(
-      regularVisitMap, PopulationInfo populationInfo) {
-    var returnRegularVisit = RegularVisit(
-        regularVisitMap['tableData']['id'],
-        regularVisitMap['tableData']['hiveId'],
-        regularVisitMap['tableData']['date'],
-        json.decode(regularVisitMap['tableData']['pictures']),
-        regularVisitMap['tableData']['description'],
-        regularVisitMap['tableData']['behavior'],
-        regularVisitMap['tableData']['queenSeen'],
-        regularVisitMap['tableData']['honeyMaking'],
-        populationInfo);
-    return returnRegularVisit;
-  }
-
-  QueenInfo generateReturnQueenInfo(
-      Map<String, dynamic> queenInfoMap, changeQueenId, QueenInfo queenInfo) {
-    var returnQueenInfo = QueenInfo(
-        queenInfoMap['tableData']['id'],
-        changeQueenId,
-        queenInfo.enterDate,
-        queenInfo.breed,
-        queenInfo.backColor);
-    return returnQueenInfo;
-  }
-
-  PopulationInfo generateReturnPopulationInfo(
-      Map<String, dynamic> populationInfoMap,
-      regularVisitId,
-      PopulationInfo populationInfo) {
-    var returnPopulationInfo = PopulationInfo(
-        populationInfoMap['tableData']['id'],
-        regularVisitId,
-        populationInfo.frames,
-        populationInfo.stairs,
-        populationInfo.status);
-    return returnPopulationInfo;
-  }
-
-  Map<String, dynamic> insertQueenInfo(changeQueenId, QueenInfo queenInfo) {
-    var queenInfoMap = {
-      'table': 'queenInfos',
-      'tableData': {
-        'id': this._idGen.generateId(),
-        'changeQueenId': changeQueenId,
-        'enterDate': queenInfo.enterDate,
-        'breed': queenInfo.breed,
-        'backColor': queenInfo.backColor
-      }
-    };
-    this._databaseWrapper.insert(queenInfoMap);
-    return queenInfoMap;
-  }
-
-  Map<String, dynamic> insertChangeQueen(changeQueenId, hiveId) {
-    var changeQueenMap = {
-      'table': 'changeQueens',
-      'tableData': {
-        'id': changeQueenId,
-        'hiveId': hiveId,
-        'date': _dateTimeProvider.getCurrentDateTime(),
-        'pictures': json.encode(null),
-        'description': '',
-      }
-    };
-    this._databaseWrapper.insert(changeQueenMap);
-    return changeQueenMap;
-  }
-
-  Map<String, dynamic> insertPopulationInfo(
-      regularVisitId, PopulationInfo populationInfo) {
-    var populationInfoMap = {
-      'table': 'populationInfos',
-      'tableData': {
-        'id': this._idGen.generateId(),
-        'regularVisitId': regularVisitId,
-        'frames': populationInfo.frames,
-        'stairs': populationInfo.stairs,
-        'status': populationInfo.status
-      }
-    };
-    this._databaseWrapper.insert(populationInfoMap);
-    return populationInfoMap;
-  }
-
-  insertHive(Hive hive) {
-    var hiveId = this._idGen.generateId();
-    var hiveMap = {
-      'table': 'hives',
-      'tableData': {
-        'id': hiveId,
-        'number': hive.number,
-        'annualHoney': hive.annualHoney,
-        'description': hive.description,
-        'picture': hive.picture
-      }
-    };
-    this._databaseWrapper.insert(hiveMap);
-    return hiveId;
-  }
-
-  insertRegularVisit(hiveId, regularVisitId) {
-    var regularVisitMap = {
-      'table': 'regularVisits',
-      'tableData': {
-        'id': regularVisitId,
-        'hiveId': hiveId,
-        'date': _dateTimeProvider.getCurrentDateTime(),
-        'pictures': json.encode(null),
-        'description': '',
-        'behavior': '',
-        'queenSeen': true,
-        'honeyMaking': ''
-      }
-    };
-    this._databaseWrapper.insert(regularVisitMap);
-    return regularVisitMap;
+  fetchLastHiveNumber() async {
+    try {
+      var lastHive = await this._appDatabase.getLastHive();
+      if (lastHive == null) return null;
+      return lastHive.number;
+    } catch (e) {
+      print(e);
+      return null;
+    }
   }
 
   @override
-  Future<int> fetchLastHiveNumber() async {
-    var rawHive = await this._databaseWrapper.selectFirst({
-      'table': 'hives',
-      'orderBy': 'number DESC',
-    });
-    if (rawHive == null) return null;
-    return rawHive['number'];
+  saveHive(Hive hive, PopulationInfo populationInfo, QueenInfo queenInfo) {
+    var hiveId = this._idGen.generateId();
+    var regularVisitId = this._idGen.generateId();
+    var changeQueenId = this._idGen.generateId();
+    var populationInfoId = this._idGen.generateId();
+    var queenInfoId = this._idGen.generateId();
+    RegularVisit completeRegularVisit = RegularVisit(
+        regularVisitId,
+        hiveId,
+        this._dateTimeProvider.getCurrentDateTime(),
+        [],
+        '',
+        '',
+        true,
+        '',
+        populationInfo);
+    ChangeQueen completeChangeQueen = ChangeQueen(changeQueenId, hiveId,
+        this._dateTimeProvider.getCurrentDateTime(), [], '', queenInfo);
+
+    Hive completeHive = Hive(
+        hiveId,
+        hive.number,
+        hive.annualHoney,
+        hive.description,
+        hive.picture,
+        populationInfo,
+        queenInfo,
+        [completeRegularVisit, completeChangeQueen]);
+    this._appDatabase.addHive(THivesCompanion.insert(
+        id: completeHive.id,
+        number: completeHive.number,
+        annualHoney: completeHive.annualHoney,
+        description: completeHive.description,
+        picture: completeHive.picture));
+    this._appDatabase.addRegularVisit(TRegularVisitsCompanion.insert(
+        id: completeRegularVisit.id,
+        hiveId: completeRegularVisit.hiveId,
+        date: completeRegularVisit.date,
+        pictures: json.encode(completeRegularVisit.pictures),
+        description: completeRegularVisit.description,
+        behavior: completeRegularVisit.behavior,
+        queenSeen: completeRegularVisit.queenSeen,
+        honeyMaking: completeRegularVisit.honeyMaking));
+    this._appDatabase.addChangeQueen(TChangeQueensCompanion.insert(
+        id: completeChangeQueen.id,
+        hiveId: completeChangeQueen.hiveId,
+        date: completeChangeQueen.date,
+        pictures: json.encode(completeChangeQueen.pictures),
+        description: completeChangeQueen.description));
+    this._appDatabase.addPopulationInfo(TPopulationInfosCompanion.insert(
+        id: populationInfoId,
+        regularVisitId: regularVisitId,
+        frames: populationInfo.frames,
+        stairs: populationInfo.stairs,
+        status: populationInfo.status));
+    this._appDatabase.addQueenInfo(TQueenInfosCompanion.insert(
+        id: queenInfoId,
+        changeQueenId: changeQueenId,
+        enterDate: queenInfo.enterDate,
+        breed: queenInfo.breed,
+        backColor: queenInfo.backColor));
+  }
+
+  Future<PopulationInfo> getHivePopulationInfo(String hiveId) async {
+    var _rawPopulationInfo =
+        await this._appDatabase.getLastPopulationInfo(hiveId);
+    return PopulationInfo(
+        _rawPopulationInfo.id,
+        _rawPopulationInfo.regularVisitId,
+        _rawPopulationInfo.frames,
+        _rawPopulationInfo.stairs,
+        _rawPopulationInfo.status);
+  }
+
+  Future<QueenInfo> getHiveQueenInfo(String hiveId) async {
+    var _rawQueenInfo = await this._appDatabase.getLastQueenInfo(hiveId);
+    return QueenInfo(_rawQueenInfo.id, _rawQueenInfo.changeQueenId,
+        _rawQueenInfo.enterDate, _rawQueenInfo.breed, _rawQueenInfo.backColor);
+  }
+
+  Future<List<Visit>> getHiveVisits(String hiveId) async {
+    List<Visit> visits = [];
+    var _rawRegularVisits = await this._appDatabase.allRegularVisits;
+    var _rawChangeQueens = await this._appDatabase.allChangeQueens;
+    var _rawHarvestHoneys = await this._appDatabase.allHarvestHoneys;
+    _rawRegularVisits.map((e) async {
+      visits.add(RegularVisit(
+          e.id,
+          e.hiveId,
+          e.date,
+          (json.decode(e.pictures) as List<dynamic>).cast<String>(),
+          e.description,
+          e.behavior,
+          e.queenSeen,
+          e.honeyMaking,
+          await getPopulationInfo(e.id)));
+    }).toList();
+    _rawChangeQueens.map((e) async {
+      visits.add(ChangeQueen(
+          e.id,
+          e.hiveId,
+          e.date,
+          (json.decode(e.pictures) as List<dynamic>).cast<String>(),
+          e.description,
+          await getQueenInfo(e.id)));
+    }).toList();
+    _rawHarvestHoneys.map((e) async {
+      visits.add(HarvestHoney(
+          e.id,
+          e.hiveId,
+          e.date,
+          (json.decode(e.pictures) as List<dynamic>).cast<String>(),
+          e.description,
+          e.describedAmount,
+          e.frames,
+          e.weight,
+          e.quality));
+    }).toList();
+    visits.sort((a, b) => a.date.compareTo(b.date));
+    return visits.reversed;
+  }
+
+  Future<PopulationInfo> getPopulationInfo(String regularVisitId) async {
+    var _rawPopulationInfo =
+        await this._appDatabase.getPopulationInfo(regularVisitId);
+    return PopulationInfo(
+        _rawPopulationInfo.id,
+        _rawPopulationInfo.regularVisitId,
+        _rawPopulationInfo.frames,
+        _rawPopulationInfo.stairs,
+        _rawPopulationInfo.status);
+  }
+
+  Future<QueenInfo> getQueenInfo(String changeQueenId) async {
+    var _rawQueenInfo = await this._appDatabase.getQueenInfo(changeQueenId);
+    return QueenInfo(_rawQueenInfo.id, _rawQueenInfo.changeQueenId,
+        _rawQueenInfo.enterDate, _rawQueenInfo.breed, _rawQueenInfo.backColor);
   }
 }

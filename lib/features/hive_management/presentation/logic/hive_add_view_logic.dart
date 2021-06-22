@@ -7,30 +7,33 @@ class AddHiveViewLogic with ChangeNotifier {
   final AddHiveCmnd _addHiveCmnd;
   final GenerateHiveNumberCmnd _generateHiveNumberCmnd;
   AddHiveViewLogic(this._addHiveCmnd, this._generateHiveNumberCmnd);
-  bool isSaveButtonPressed = false;
-  bool formValidated = false;
   bool isLoading = false;
   String picture, breed, queenBackColor, status, description;
   int hiveNumber, frames, stairs, annualHoney;
   DateTime queenAddedDate;
 
-  List<String> invalidFields = [];
+  Set<String> invalidFields = {};
 
   void saveHivePressed() {
-    if (formValidated = true) {
+    if (validateForm()) {
       var hive = Hive(null, hiveNumber, annualHoney, description, picture, null,
           null, null);
       var populationInfo = PopulationInfo(null, null, frames, stairs, status);
       var queenInfo =
           QueenInfo(null, null, queenAddedDate, breed, queenBackColor);
       isLoading = true;
+      notifyListeners();
       addHive(hive, populationInfo, queenInfo).then((value) {
         isLoading = false;
         notifyListeners();
       });
     } else
-      isSaveButtonPressed = true;
-    notifyListeners();
+      notifyListeners();
+  }
+
+  bool validateForm() {
+    if (hiveNumber != null && invalidFields.isEmpty) return true;
+    return false;
   }
 
   Future<int> generateHiveNumber() async {

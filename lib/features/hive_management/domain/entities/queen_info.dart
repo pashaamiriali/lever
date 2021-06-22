@@ -10,7 +10,9 @@ class QueenInfo {
 
   static QueenInfo fromMap(Map<String, dynamic> map) {
     if (map == null) return null;
-    return QueenInfo(map['id'], map['changeQueenId'], map['enterDate'],
+    return QueenInfo(map['id'], map['changeQueenId'], map['enterDate'] == null
+            ? null
+            : DateTime.fromMillisecondsSinceEpoch(map['enterDate']),
         map['breed'], map['backColor']);
   }
 
@@ -18,7 +20,7 @@ class QueenInfo {
     return {
       'id': this.id,
       'changeQueenId': this.changeQueenId,
-      'enterDate': this.enterDate,
+      'enterDate': this.enterDate.millisecondsSinceEpoch,
       'breed': this.breed,
       'backColor': this.backColor
     };

@@ -26,7 +26,7 @@ class RegularVisit extends Visit {
     return RegularVisit(
       map['id'],
       map['hiveId'],
-      map['date'],
+      map['date']==null?null:DateTime.fromMillisecondsSinceEpoch(map['date']),
       (json.decode(map['pictures']) as List<dynamic>).cast<String>(),
       map['description'],
       map['behavior'],
@@ -40,7 +40,7 @@ class RegularVisit extends Visit {
     return {
       'id': this.id,
       'hiveId': this.hiveId,
-      'date': this.date,
+      'date': this.date.millisecondsSinceEpoch,
       'pictures': json.encode(this.pictures),
       'description': this.description,
       'behavior': this.behavior,

@@ -1,5 +1,5 @@
 abstract class DateTimeProvider{
-  getCurrentDateTime();
+  DateTime getCurrentDateTime();
 }
 class DateTimeProviderImpl implements DateTimeProvider{
   @override

@@ -6,6 +6,7 @@ import 'package:lever/core/dependency_management/injection/InjectorProvider.dart
 import 'package:lever/core/dependency_management/injection/injector.dart';
 import 'package:lever/core/infrastructure/camera/take_picture_screen.dart';
 import 'package:lever/features/hive_management/presentation/logic/hive_add_view_logic.dart';
+import 'package:shamsi_date/extensions.dart';
 
 class NotesSection extends StatelessWidget {
   final AddHiveViewLogic model;
@@ -162,12 +163,32 @@ class QueenBackColorSection extends StatelessWidget {
   }
 }
 
-class QueenEnterDateSection extends StatelessWidget {
+class QueenEnterDateSection extends StatefulWidget {
   final AddHiveViewLogic model;
   const QueenEnterDateSection({
     Key key,
     this.model,
   }) : super(key: key);
+
+  @override
+  _QueenEnterDateSectionState createState() => _QueenEnterDateSectionState();
+}
+
+class _QueenEnterDateSectionState extends State<QueenEnterDateSection> {
+  TextEditingController _dayController, _monthController, _yearController;
+  @override
+  void initState() {
+    super.initState();
+    _dayController = TextEditingController();
+    _monthController = TextEditingController();
+    _yearController = TextEditingController();
+    _dayController
+        .addListener(() => _listenForValidation(_validateDayField, 'day'));
+    _monthController
+        .addListener(() => _listenForValidation(_validateMonthField, 'month'));
+    _yearController
+        .addListener(() => _listenForValidation(_validateYearField, 'year'));
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -180,7 +201,7 @@ class QueenEnterDateSection extends StatelessWidget {
             CustomTextField(
               widthInPercent: 0.3,
               hintText: 'سال',
-              controller: TextEditingController(),
+              controller: _yearController,
               inputType: TextInputType.number,
             ),
             SizedBox(
@@ -189,7 +210,7 @@ class QueenEnterDateSection extends StatelessWidget {
             CustomTextField(
               widthInPercent: 0.3,
               hintText: 'ماه',
-              controller: TextEditingController(),
+              controller: _monthController,
               inputType: TextInputType.number,
             ),
             SizedBox(
@@ -198,7 +219,7 @@ class QueenEnterDateSection extends StatelessWidget {
             CustomTextField(
               widthInPercent: 0.3,
               hintText: 'روز',
-              controller: TextEditingController(),
+              controller: _dayController,
               inputType: TextInputType.number,
             ),
           ],
@@ -206,14 +227,74 @@ class QueenEnterDateSection extends StatelessWidget {
       ],
     );
   }
+
+  void _listenForValidation(Function validator, String fieldName) {
+    if (!validator())
+      widget.model.invalidFields.add(fieldName);
+    else if (widget.model.invalidFields.contains(fieldName))
+      widget.model.invalidFields.remove(fieldName);
+  }
+
+  bool _validateDayField() {
+    try {
+      int day = int.parse(_dayController.text);
+      if (day > 0 && day < 32)
+        return true;
+      else
+        return false;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  bool _validateMonthField() {
+    try {
+      int month = int.parse(_monthController.text);
+      if (month > 0 && month < 13)
+        return true;
+      else
+        return false;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  bool _validateYearField() {
+    try {
+      int year = int.parse(_yearController.text);
+      if (year > 0 && year < Jalali.now().year + 1)
+        return true;
+      else
+        return false;
+    } catch (e) {
+      return false;
+    }
+  }
 }
 
-class BreedSection extends StatelessWidget {
+class BreedSection extends StatefulWidget {
   final AddHiveViewLogic model;
   const BreedSection({
     Key key,
     this.model,
   }) : super(key: key);
+
+  @override
+  _BreedSectionState createState() => _BreedSectionState();
+}
+
+class _BreedSectionState extends State<BreedSection> {
+  TextEditingController _controller;
+  @override
+  void initState() {
+    _controller = TextEditingController();
+    _controller.addListener(() => _setModelText());
+    super.initState();
+  }
+
+  void _setModelText() {
+    widget.model.breed = _controller.text;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -226,21 +307,8 @@ class BreedSection extends StatelessWidget {
             child: CustomTextField(
               widthInPercent: 0.7,
               hintText: 'نام نژاد را وارد کنید',
-              controller: TextEditingController(),
+              controller: _controller,
             )),
-        Wrap(
-          children: [
-            MaterialButton(
-              onPressed: () {
-                //TODO: implement onpressed
-              },
-              child: Text('selectable button'),
-              elevation: 0,
-              focusElevation: 0,
-              shape: StadiumBorder(),
-            ),
-          ],
-        ),
       ],
     );
   }

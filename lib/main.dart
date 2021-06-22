@@ -25,7 +25,7 @@ class MyApp extends StatelessWidget {
     return InjectorProvider(
       injector: this.injector,
       child: MaterialApp(
-        title: 'Flutter Demo',
+        title: 'Lever',
         theme: ThemeData(
           primarySwatch: Colors.indigo,
           colorScheme: ColorScheme(

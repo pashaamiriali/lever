@@ -12,7 +12,13 @@ class Visit {
 
   static Visit fromMap(Map<String, dynamic> map) {
     if (map == null) return null;
-    return Visit(map['id'], map['hiveId'], map['date'], (json.decode(map['pictures']) as List<dynamic>).cast<String>(),
+    return Visit(
+        map['id'],
+        map['hiveId'],
+        map['date'] == null
+            ? null
+            : DateTime.fromMillisecondsSinceEpoch(map['date']),
+        (json.decode(map['pictures']) as List<dynamic>).cast<String>(),
         map['description']);
   }
 
@@ -20,7 +26,7 @@ class Visit {
     return {
       'id': this.id,
       'hiveId': this.hiveId,
-      'date': this.date,
+      'date': this.date.millisecondsSinceEpoch,
       'pictures': json.encode(this.pictures),
       'description': this.description
     };
