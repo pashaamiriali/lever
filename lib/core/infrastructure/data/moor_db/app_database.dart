@@ -77,14 +77,14 @@ class AppDatabase extends _$AppDatabase {
         .getSingle();
   }
 
-  Future<THive> getLastHive() {
+  Future<List<THive>> getLastHives() {
     var h = (select(tHives)
           ..orderBy(
             [
               (t) => OrderingTerm(expression: t.number, mode: OrderingMode.desc)
             ],
           ))
-        .getSingle();
+        .get();
     return h;
   }
 

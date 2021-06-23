@@ -2,15 +2,15 @@ import 'package:flutter/cupertino.dart';
 import 'package:lever/features/hive_management/domain/entities/entities.dart';
 import 'package:lever/features/hive_management/domain/usecases/generate_hive_number_cmnd.dart';
 import 'package:lever/features/hive_management/domain/usecases/usecases.dart';
-
+enum ProcessState{none,loading,finished}
 class AddHiveViewLogic with ChangeNotifier {
   final AddHiveCmnd _addHiveCmnd;
   final GenerateHiveNumberCmnd _generateHiveNumberCmnd;
   AddHiveViewLogic(this._addHiveCmnd, this._generateHiveNumberCmnd);
-  bool isLoading = false;
-  String picture, breed, queenBackColor, status, description;
-  int hiveNumber, frames, stairs, annualHoney;
-  DateTime queenAddedDate;
+  ProcessState processState = ProcessState.none;
+  String picture='', breed='', queenBackColor='', status='متوسط', description='';
+  int hiveNumber, frames=0, stairs=0, annualHoney=0;
+  DateTime queenAddedDate=DateTime(0);
 
   Set<String> invalidFields = {};
 
@@ -21,10 +21,10 @@ class AddHiveViewLogic with ChangeNotifier {
       var populationInfo = PopulationInfo(null, null, frames, stairs, status);
       var queenInfo =
           QueenInfo(null, null, queenAddedDate, breed, queenBackColor);
-      isLoading = true;
+      processState = ProcessState.loading;
       notifyListeners();
       addHive(hive, populationInfo, queenInfo).then((value) {
-        isLoading = false;
+        processState = ProcessState.finished;
         notifyListeners();
       });
     } else

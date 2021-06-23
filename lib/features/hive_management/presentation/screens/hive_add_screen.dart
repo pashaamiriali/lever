@@ -111,8 +111,34 @@ class AddHiveView extends StatelessWidget {
                             );
                           });
                     model.saveHivePressed();
-                    Scaffold.of(context).showBottomSheet(
-                        (context) => CircularProgressIndicator());
+                    if (model.processState == ProcessState.loading)
+                      showDialog(
+                          context: context,
+                          builder: (context) => AlertDialog(
+                                content: Container(
+                                  width: 50,
+                                  height: 50,
+                                  margin: EdgeInsets.all(20),
+                                  child: CircularProgressIndicator(),
+                                ),
+                              ),
+                          barrierDismissible: false);
+                    if (model.processState == ProcessState.loading)
+                      showDialog(
+                          context: context,
+                          builder: (context) => AlertDialog(
+                                content: Text('انجام شد'),
+                                actions: [
+                                  MaterialButton(
+                                    onPressed: () {
+                                      Navigator.of(context)
+                                          .pushReplacementNamed('/');
+                                    },
+                                    child: Text('تایید'),
+                                  )
+                                ],
+                              ),
+                          barrierDismissible: false);
                   },
                 )
               ],

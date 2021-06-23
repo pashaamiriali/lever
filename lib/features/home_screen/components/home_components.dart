@@ -53,6 +53,7 @@ class HomeHivesListItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
+      margin: EdgeInsets.symmetric(vertical: 8),
       padding: EdgeInsets.all(8),
       decoration: BoxDecoration(
         border: Border.all(
@@ -85,7 +86,7 @@ class HomeHivesListItem extends StatelessWidget {
   }
 
   Widget _showHivePicture(Hive hive, BuildContext context) {
-    if (hive.picture != null) {
+    if (hive.picture != null && hive.picture.isNotEmpty) {
       return Container(
         width: 60,
         height: 60,
@@ -166,7 +167,8 @@ class HomeBottomNavigationBar extends StatelessWidget {
                   color: Theme.of(context).colorScheme.background,
                   elevation: 0,
                   highlightElevation: 0,
-                  onPressed: () => Navigator.of(context).pushReplacementNamed('addHive'),
+                  onPressed: () =>
+                      Navigator.of(context).pushReplacementNamed('addHive'),
                   child: Text('افزودن'),
                 ),
               ],

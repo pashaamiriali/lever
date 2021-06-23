@@ -21,15 +21,7 @@ class HiveRepoImpl extends HiveRepo {
     List<Hive> hivesList = [];
     var rawHives = await this._appDatabase.allHives;
     rawHives.map((e) async {
-      hivesList.add(Hive(
-          e.id,
-          e.number,
-          e.annualHoney,
-          e.description,
-          e.picture,
-          await getHivePopulationInfo(e.id),
-          await getHiveQueenInfo(e.id),
-          await getHiveVisits(e.id)));
+      return hivesList.add(await _hiveFromHiveTable(e));
     }).toList();
     return hivesList;
   }
@@ -37,7 +29,7 @@ class HiveRepoImpl extends HiveRepo {
   @override
   fetchLastHiveNumber() async {
     try {
-      var lastHive = await this._appDatabase.getLastHive();
+      var lastHive = (await this._appDatabase.getLastHives()).first;
       if (lastHive == null) return null;
       return lastHive.number;
     } catch (e) {
@@ -47,12 +39,60 @@ class HiveRepoImpl extends HiveRepo {
   }
 
   @override
-  saveHive(Hive hive, PopulationInfo populationInfo, QueenInfo queenInfo) {
+  Future<void> saveHive(
+      Hive hive, PopulationInfo populationInfo, QueenInfo queenInfo) async {
     var hiveId = this._idGen.generateId();
     var regularVisitId = this._idGen.generateId();
     var changeQueenId = this._idGen.generateId();
     var populationInfoId = this._idGen.generateId();
     var queenInfoId = this._idGen.generateId();
+    RegularVisit completeRegularVisit =
+        _generateCompleteRegularVisit(regularVisitId, hiveId, populationInfo);
+    ChangeQueen completeChangeQueen =
+        _generateCompleteChangeQueen(changeQueenId, hiveId, queenInfo);
+
+    Hive completeHive = _generateCompleteHive(hiveId, hive, populationInfo,
+        queenInfo, completeRegularVisit, completeChangeQueen);
+    await _addHive(completeHive);
+    await _addRegularVisitForHive(completeRegularVisit);
+    await _addChangeQueenForHive(completeChangeQueen);
+    await _addPopulationInfoForHive(
+        populationInfoId, regularVisitId, populationInfo);
+    await _addQueenInfoForHive(queenInfoId, changeQueenId, queenInfo);
+  }
+  @override
+  deleteHive(String hiveId) {
+    // TODO: implement deleteHive
+    throw UnimplementedError();
+  }
+  Hive _generateCompleteHive(
+      hiveId,
+      Hive hive,
+      PopulationInfo populationInfo,
+      QueenInfo queenInfo,
+      RegularVisit completeRegularVisit,
+      ChangeQueen completeChangeQueen) {
+    Hive completeHive = Hive(
+        hiveId,
+        hive.number,
+        hive.annualHoney,
+        hive.description,
+        hive.picture,
+        populationInfo,
+        queenInfo,
+        [completeRegularVisit, completeChangeQueen]);
+    return completeHive;
+  }
+
+  ChangeQueen _generateCompleteChangeQueen(
+      changeQueenId, hiveId, QueenInfo queenInfo) {
+    ChangeQueen completeChangeQueen = ChangeQueen(changeQueenId, hiveId,
+        this._dateTimeProvider.getCurrentDateTime(), [], '', queenInfo);
+    return completeChangeQueen;
+  }
+
+  RegularVisit _generateCompleteRegularVisit(
+      regularVisitId, hiveId, PopulationInfo populationInfo) {
     RegularVisit completeRegularVisit = RegularVisit(
         regularVisitId,
         hiveId,
@@ -63,25 +103,43 @@ class HiveRepoImpl extends HiveRepo {
         true,
         '',
         populationInfo);
-    ChangeQueen completeChangeQueen = ChangeQueen(changeQueenId, hiveId,
-        this._dateTimeProvider.getCurrentDateTime(), [], '', queenInfo);
+    return completeRegularVisit;
+  }
 
-    Hive completeHive = Hive(
-        hiveId,
-        hive.number,
-        hive.annualHoney,
-        hive.description,
-        hive.picture,
-        populationInfo,
-        queenInfo,
-        [completeRegularVisit, completeChangeQueen]);
-    this._appDatabase.addHive(THivesCompanion.insert(
-        id: completeHive.id,
-        number: completeHive.number,
-        annualHoney: completeHive.annualHoney,
-        description: completeHive.description,
-        picture: completeHive.picture));
-    this._appDatabase.addRegularVisit(TRegularVisitsCompanion.insert(
+
+
+  Future<void> _addQueenInfoForHive(
+      queenInfoId, changeQueenId, QueenInfo queenInfo) async {
+    await this._appDatabase.addQueenInfo(TQueenInfosCompanion.insert(
+        id: queenInfoId,
+        changeQueenId: changeQueenId,
+        enterDate: queenInfo.enterDate,
+        breed: queenInfo.breed,
+        backColor: queenInfo.backColor));
+  }
+
+  Future<void> _addPopulationInfoForHive(
+      populationInfoId, regularVisitId, PopulationInfo populationInfo) async {
+    await this._appDatabase.addPopulationInfo(TPopulationInfosCompanion.insert(
+        id: populationInfoId,
+        regularVisitId: regularVisitId,
+        frames: populationInfo.frames,
+        stairs: populationInfo.stairs,
+        status: populationInfo.status));
+  }
+
+  Future<void> _addChangeQueenForHive(ChangeQueen completeChangeQueen) async {
+    await this._appDatabase.addChangeQueen(TChangeQueensCompanion.insert(
+        id: completeChangeQueen.id,
+        hiveId: completeChangeQueen.hiveId,
+        date: completeChangeQueen.date,
+        pictures: json.encode(completeChangeQueen.pictures),
+        description: completeChangeQueen.description));
+  }
+
+  Future<void> _addRegularVisitForHive(
+      RegularVisit completeRegularVisit) async {
+    await this._appDatabase.addRegularVisit(TRegularVisitsCompanion.insert(
         id: completeRegularVisit.id,
         hiveId: completeRegularVisit.hiveId,
         date: completeRegularVisit.date,
@@ -90,24 +148,15 @@ class HiveRepoImpl extends HiveRepo {
         behavior: completeRegularVisit.behavior,
         queenSeen: completeRegularVisit.queenSeen,
         honeyMaking: completeRegularVisit.honeyMaking));
-    this._appDatabase.addChangeQueen(TChangeQueensCompanion.insert(
-        id: completeChangeQueen.id,
-        hiveId: completeChangeQueen.hiveId,
-        date: completeChangeQueen.date,
-        pictures: json.encode(completeChangeQueen.pictures),
-        description: completeChangeQueen.description));
-    this._appDatabase.addPopulationInfo(TPopulationInfosCompanion.insert(
-        id: populationInfoId,
-        regularVisitId: regularVisitId,
-        frames: populationInfo.frames,
-        stairs: populationInfo.stairs,
-        status: populationInfo.status));
-    this._appDatabase.addQueenInfo(TQueenInfosCompanion.insert(
-        id: queenInfoId,
-        changeQueenId: changeQueenId,
-        enterDate: queenInfo.enterDate,
-        breed: queenInfo.breed,
-        backColor: queenInfo.backColor));
+  }
+
+  Future<void> _addHive(Hive completeHive) async {
+    await this._appDatabase.addHive(THivesCompanion.insert(
+        id: completeHive.id,
+        number: completeHive.number,
+        annualHoney: completeHive.annualHoney,
+        description: completeHive.description,
+        picture: completeHive.picture));
   }
 
   Future<PopulationInfo> getHivePopulationInfo(String hiveId) async {
@@ -166,7 +215,7 @@ class HiveRepoImpl extends HiveRepo {
           e.quality));
     }).toList();
     visits.sort((a, b) => a.date.compareTo(b.date));
-    return visits.reversed;
+    return visits;
   }
 
   Future<PopulationInfo> getPopulationInfo(String regularVisitId) async {
@@ -184,5 +233,17 @@ class HiveRepoImpl extends HiveRepo {
     var _rawQueenInfo = await this._appDatabase.getQueenInfo(changeQueenId);
     return QueenInfo(_rawQueenInfo.id, _rawQueenInfo.changeQueenId,
         _rawQueenInfo.enterDate, _rawQueenInfo.breed, _rawQueenInfo.backColor);
+  }
+
+  Future<Hive> _hiveFromHiveTable(THive hive) async {
+    return Hive(
+        hive.id,
+        hive.number,
+        hive.annualHoney,
+        hive.description,
+        hive.picture,
+        await getHivePopulationInfo(hive.id),
+        await getHiveQueenInfo(hive.id),
+        await getHiveVisits(hive.id));
   }
 }

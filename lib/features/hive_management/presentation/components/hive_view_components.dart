@@ -8,12 +8,27 @@ import 'package:lever/core/infrastructure/camera/take_picture_screen.dart';
 import 'package:lever/features/hive_management/presentation/logic/hive_add_view_logic.dart';
 import 'package:shamsi_date/extensions.dart';
 
-class NotesSection extends StatelessWidget {
+class NotesSection extends StatefulWidget {
   final AddHiveViewLogic model;
   const NotesSection({
     Key key,
     this.model,
   }) : super(key: key);
+
+  @override
+  _NotesSectionState createState() => _NotesSectionState();
+}
+
+class _NotesSectionState extends State<NotesSection> {
+  TextEditingController notesController;
+  @override
+  void initState() {
+    super.initState();
+    notesController = TextEditingController();
+    notesController.addListener(() {
+      widget.model.description = notesController.text;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -24,6 +39,7 @@ class NotesSection extends StatelessWidget {
         Container(
           width: MediaQuery.of(context).size.width * 0.9,
           child: TextField(
+            controller: notesController,
             maxLines: 8,
             textDirection: TextDirection.rtl,
             decoration: InputDecoration(
@@ -38,12 +54,33 @@ class NotesSection extends StatelessWidget {
   }
 }
 
-class AnnualHoneySection extends StatelessWidget {
+class AnnualHoneySection extends StatefulWidget {
   final AddHiveViewLogic model;
   const AnnualHoneySection({
     Key key,
     this.model,
   }) : super(key: key);
+
+  @override
+  _AnnualHoneySectionState createState() => _AnnualHoneySectionState();
+}
+
+class _AnnualHoneySectionState extends State<AnnualHoneySection> {
+  TextEditingController annualHoneyController;
+  @override
+  void initState() {
+    annualHoneyController = TextEditingController();
+    annualHoneyController.addListener(() {
+      if (validateField(annualHoneyController.text)) {
+        widget.model.annualHoney = int.parse(annualHoneyController.text);
+        widget.model.invalidFields.remove('annualHoney');
+      } else {
+        if (widget.model.invalidFields.contains('annualHoney'))
+          widget.model.invalidFields.add('annualHoney');
+      }
+    });
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -60,9 +97,18 @@ class AnnualHoneySection extends StatelessWidget {
       ],
     );
   }
+
+  bool validateField(String value) {
+    try {
+      int.parse(value);
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
 }
 
-class StatusSection extends StatelessWidget {
+class StatusSection extends StatefulWidget {
   final AddHiveViewLogic model;
   const StatusSection({
     Key key,
@@ -70,35 +116,71 @@ class StatusSection extends StatelessWidget {
   }) : super(key: key);
 
   @override
+  _StatusSectionState createState() => _StatusSectionState();
+}
+
+class _StatusSectionState extends State<StatusSection> {
+  String _dropdownValue = 'متوسط';
+  @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
         InputTitle(text: 'وضعیت'),
-        Wrap(
-          children: [
-            MaterialButton(
-              onPressed: () {
-                //TODO: implement onpressed
-              },
-              child: Text('selectable button'),
-              elevation: 0,
-              focusElevation: 0,
-              shape: StadiumBorder(),
-            ),
-          ],
-        ),
+        DropdownButton(
+          value: _dropdownValue,
+            onChanged: (value) {
+              setState(() {
+                widget.model.status = value;
+                _dropdownValue = value;
+              });
+            },
+            items: <String>['قوی', 'متوسط', 'ضعیف', 'بیمار']
+                .map((e) => DropdownMenuItem<String>(value: e, child: Text(e)))
+                .toList())
       ],
     );
   }
 }
 
-class FrameStairsSection extends StatelessWidget {
+class FrameStairsSection extends StatefulWidget {
   final AddHiveViewLogic model;
   const FrameStairsSection({
     Key key,
     this.model,
   }) : super(key: key);
+
+  @override
+  _FrameStairsSectionState createState() => _FrameStairsSectionState();
+}
+
+class _FrameStairsSectionState extends State<FrameStairsSection> {
+  TextEditingController framesController;
+  TextEditingController stairsController;
+  @override
+  void initState() {
+    framesController = TextEditingController();
+    stairsController = TextEditingController();
+    framesController.addListener(() {
+      if (validateField(framesController.text)) {
+        widget.model.frames = int.parse(framesController.text);
+        widget.model.invalidFields.remove('frames');
+      } else {
+        if (widget.model.invalidFields.contains('frames'))
+          widget.model.invalidFields.add('frames');
+      }
+    });
+    stairsController.addListener(() {
+      if (validateField(stairsController.text)) {
+        widget.model.stairs = int.parse(stairsController.text);
+        widget.model.invalidFields.remove('stairs');
+      } else {
+        if (widget.model.invalidFields.contains('stairs'))
+          widget.model.invalidFields.add('stairs');
+      }
+    });
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -112,7 +194,7 @@ class FrameStairsSection extends StatelessWidget {
             CustomTextField(
               widthInPercent: 0.4,
               hintText: 'تعداد قاب',
-              controller: TextEditingController(),
+              controller: framesController,
               inputType: TextInputType.number,
             ),
             SizedBox(
@@ -121,7 +203,7 @@ class FrameStairsSection extends StatelessWidget {
             CustomTextField(
               widthInPercent: 0.4,
               hintText: 'تعداد طبق',
-              controller: TextEditingController(),
+              controller: stairsController,
               inputType: TextInputType.number,
             ),
           ],
@@ -129,9 +211,18 @@ class FrameStairsSection extends StatelessWidget {
       ],
     );
   }
+
+  bool validateField(String value) {
+    try {
+      int.parse(value);
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
 }
 
-class QueenBackColorSection extends StatelessWidget {
+class QueenBackColorSection extends StatefulWidget {
   final AddHiveViewLogic model;
   const QueenBackColorSection({
     Key key,
@@ -139,27 +230,69 @@ class QueenBackColorSection extends StatelessWidget {
   }) : super(key: key);
 
   @override
+  _QueenBackColorSectionState createState() => _QueenBackColorSectionState();
+}
+
+class _QueenBackColorSectionState extends State<QueenBackColorSection> {
+  int _dropdownValue = 0XFFFF0000;
+  @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
         InputTitle(text: 'رنگ پشت ملکه'),
-        DropdownButton(items: [
-          DropdownMenuItem(
-              child: Row(
-            children: [
-              Container(
-                width: 15,
-                height: 15,
-                decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(20), color: Colors.red),
-              ),
-              Text('قرمز')
-            ],
-          )),
-        ]),
+        DropdownButton(
+          value: _dropdownValue,
+          onChanged: (value) {
+            setState(() {
+              widget.model.queenBackColor = value.toString();
+              _dropdownValue = value;
+            });
+          },
+          items:
+              <int>[0XFFFF0000, 0XFFFFFFFF, 0XFF0000FF, 0XFFFFFF00, 0XFF00FF00]
+                  .map(
+                    (e) => DropdownMenuItem<int>(
+                        value: e,
+                        child: Row(
+                          children: [
+                            Container(
+                              width: 15,
+                              height: 15,
+                              decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(20),
+                                  color: Color(e)),
+                            ),
+                            Text(getColorNameFromCode(e))
+                          ],
+                        )),
+                  )
+                  .toList(),
+        ),
       ],
     );
+  }
+}
+
+String getColorNameFromCode(int colorCode) {
+  switch (colorCode) {
+    case (0XFFFF0000):
+      return 'قرمز';
+      break;
+    case (0XFFFFFFFF):
+      return 'سفید';
+      break;
+    case (0XFF0000FF):
+      return 'آبی';
+      break;
+    case (0XFFFFFF00):
+      return 'زرد';
+      break;
+    case (0XFF00FF00):
+      return 'سبز';
+      break;
+    default:
+      return 'خطا';
   }
 }
 
@@ -314,12 +447,24 @@ class _BreedSectionState extends State<BreedSection> {
   }
 }
 
-class HiveNumberSection extends StatelessWidget {
+class HiveNumberSection extends StatefulWidget {
   final AddHiveViewLogic model;
   const HiveNumberSection({
     Key key,
     this.model,
   }) : super(key: key);
+
+  @override
+  _HiveNumberSectionState createState() => _HiveNumberSectionState();
+}
+
+class _HiveNumberSectionState extends State<HiveNumberSection> {
+  Future _generateNumberFuture;
+  @override
+  void initState() {
+    _generateNumberFuture = widget.model.generateHiveNumber();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -330,10 +475,11 @@ class HiveNumberSection extends StatelessWidget {
         Padding(
           padding: const EdgeInsets.all(8.0),
           child: FutureBuilder<int>(
-              future: model.generateHiveNumber(),
+              future: _generateNumberFuture,
               builder: (context, snapshot) {
                 var theme = Theme.of(context);
-                if (snapshot.hasData)
+                if (snapshot.connectionState == ConnectionState.done &&
+                    snapshot.hasData)
                   return Center(
                     child: Text(snapshot.data.toString()),
                   );

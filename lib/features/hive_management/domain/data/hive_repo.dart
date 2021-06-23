@@ -4,4 +4,5 @@ abstract class HiveRepo {
   saveHive(Hive hive, PopulationInfo populationInfo, QueenInfo queenInfo);
   fetchHives();
   fetchLastHiveNumber();
+  deleteHive(String hiveId);
 }
