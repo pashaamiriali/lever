@@ -6,6 +6,7 @@ import 'package:lever/core/infrastructure/data/id_generator.dart';
 import 'package:lever/core/infrastructure/data/moor_db/app_database.dart';
 import 'package:lever/features/hive_management/data/hive_repo_impl.dart';
 import 'package:lever/features/hive_management/domain/usecases/add_hive_cmnd.dart';
+import 'package:lever/features/hive_management/domain/usecases/delete_hive_cmnd.dart';
 import 'package:lever/features/hive_management/domain/usecases/fetch_hives_cmnd.dart';
 import 'package:lever/features/hive_management/domain/usecases/generate_hive_number_cmnd.dart';
 import 'package:path/path.dart';
@@ -45,4 +46,5 @@ class Injector {
   FetchHivesCmnd get getFetchHivesCmnd => FetchHivesCmnd(this._hiveRepoImpl);
   GenerateHiveNumberCmnd get getGenerateHiveNumberCmnd =>
       GenerateHiveNumberCmnd(this._hiveRepoImpl);
+  DeleteHiveCmnd get getDeleteHiveCmnd => DeleteHiveCmnd(this._hiveRepoImpl);
 }

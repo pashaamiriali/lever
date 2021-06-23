@@ -20,6 +20,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return ChangeNotifierProvider<HomeScreenModel>(
       create: (context) => HomeScreenModel(
         _injector.getFetchHivesCmnd,
+        _injector.getDeleteHiveCmnd
       ),
       child: Scaffold(
         body: Container(

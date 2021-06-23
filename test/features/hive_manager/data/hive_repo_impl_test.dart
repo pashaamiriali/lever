@@ -93,7 +93,7 @@ main() {
         exampleHiveRecord.picture,
         exampleRegularVisit.populationInfo,
         exampleChangeQueen.queenInfo,
-        [exampleRegularVisit,exampleChangeQueen]);
+        [exampleRegularVisit, exampleChangeQueen]);
     test('should return a list of hives', () async {
       HiveRepoImpl hiveRepoImpl =
           HiveRepoImpl(mockAppDatabase, mockIdGen, mockDateTimeProvider);
@@ -101,6 +101,22 @@ main() {
           .thenAnswer((realInvocation) async => [exampleHiveRecord]);
       List<Hive> result = await hiveRepoImpl.fetchHives();
       expect(result[0].toMap(), exampleHive.toMap());
+    });
+  });
+  group('deleteHive', () {
+    MockAppDatabase mockAppDatabase = MockAppDatabase();
+    MockIdGen mockIdGen = MockIdGen();
+    MockDateTimeProvider mockDateTimeProvider = MockDateTimeProvider();
+    test('should call teh deleteHive method with proper id', () async {
+      HiveRepoImpl impl =
+          HiveRepoImpl(mockAppDatabase, mockIdGen, mockDateTimeProvider);
+      var hiveId = 'someId123';
+      await impl.deleteHive(hiveId);
+      expect(
+          verify(
+            mockAppDatabase.deleteHive(captureAny),
+          ).captured[0],
+          hiveId);
     });
   });
 }

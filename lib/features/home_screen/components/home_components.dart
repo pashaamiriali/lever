@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:lever/core/components/global_view_components.dart';
 import 'package:lever/features/hive_management/domain/entities/entities.dart';
+import 'package:lever/features/hive_management/presentation/logic/hive_add_view_logic.dart';
 import 'package:lever/features/home_screen/logic/home_screen_model.dart';
 
 class HomeHivesList extends StatelessWidget {
@@ -25,7 +26,7 @@ class HomeHivesList extends StatelessWidget {
                   itemCount: _hives.length,
                   itemBuilder: (context, index) {
                     var hive = _hives[index];
-                    return HomeHivesListItem(hive: hive);
+                    return HomeHivesListItem(hive: hive, model: model);
                   });
             }
           } else if (snapshot.hasError) {
@@ -42,14 +43,22 @@ class HomeHivesList extends StatelessWidget {
   }
 }
 
-class HomeHivesListItem extends StatelessWidget {
+class HomeHivesListItem extends StatefulWidget {
   const HomeHivesListItem({
     Key key,
     @required this.hive,
+    this.model,
   }) : super(key: key);
-
+  final HomeScreenModel model;
   final Hive hive;
 
+  @override
+  _HomeHivesListItemState createState() => _HomeHivesListItemState();
+}
+
+class _HomeHivesListItemState extends State<HomeHivesListItem> {
+  bool _showContext = false;
+  bool _isLoading = false;
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -64,23 +73,56 @@ class HomeHivesListItem extends StatelessWidget {
         borderRadius: BorderRadius.circular(33),
         color: Colors.transparent,
       ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: [
-          Column(
-            children: [
-              Text('وضعیت:' + hive.populationInfo.status),
-              Text('آخرین بازدید:' + hive.visits.first.date.toString())
-            ],
-          ),
-          Text(
-            hive.number.toString(),
-            style: Theme.of(context).textTheme.headline4,
-          ),
-          Align(
-              alignment: Alignment.centerRight,
-              child: this._showHivePicture(hive, context)),
-        ],
+      child: _isLoading?CircularProgressIndicator(): InkWell(
+        onLongPress: () {
+          setState(() {
+            _showContext = true;
+          });
+        },
+        child: _showContext
+            ? Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  MaterialButton(
+                    onPressed: () {
+                      setState(() {
+                        _showContext = false;
+                      });
+                    },
+                    child: Icon(Icons.arrow_back_rounded),
+                  ),
+                  MaterialButton(
+                    onPressed: () {
+                      setState(() {
+                        _isLoading = true;
+                        widget.model.deleteHive(widget.hive.id);
+                      });
+                    },
+                    child: Row(
+                      children: [Icon(Icons.delete), Text('حذف')],
+                    ),
+                  )
+                ],
+              )
+            : Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  Column(
+                    children: [
+                      Text('وضعیت:' + widget.hive.populationInfo.status),
+                      Text('آخرین بازدید:' +
+                          widget.hive.visits.first.date.toString())
+                    ],
+                  ),
+                  Text(
+                    widget.hive.number.toString(),
+                    style: Theme.of(context).textTheme.headline4,
+                  ),
+                  Align(
+                      alignment: Alignment.centerRight,
+                      child: this._showHivePicture(widget.hive, context)),
+                ],
+              ),
       ),
     );
   }

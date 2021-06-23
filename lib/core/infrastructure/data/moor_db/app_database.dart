@@ -107,4 +107,8 @@ class AppDatabase extends _$AppDatabase {
   Future<int> addQueenInfo(TQueenInfosCompanion queenInfo) {
     return into(tQueenInfos).insert(queenInfo);
   }
+
+  Future<void> deleteHive(String hiveId) async {
+    await (delete(tHives)..where((tbl) => tbl.id.equals(hiveId))).go();
+  }
 }

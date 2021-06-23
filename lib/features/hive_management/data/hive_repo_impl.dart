@@ -60,11 +60,12 @@ class HiveRepoImpl extends HiveRepo {
         populationInfoId, regularVisitId, populationInfo);
     await _addQueenInfoForHive(queenInfoId, changeQueenId, queenInfo);
   }
+
   @override
-  deleteHive(String hiveId) {
-    // TODO: implement deleteHive
-    throw UnimplementedError();
+  Future<void> deleteHive(String hiveId) async {
+    await this._appDatabase.deleteHive(hiveId);
   }
+
   Hive _generateCompleteHive(
       hiveId,
       Hive hive,
@@ -105,8 +106,6 @@ class HiveRepoImpl extends HiveRepo {
         populationInfo);
     return completeRegularVisit;
   }
-
-
 
   Future<void> _addQueenInfoForHive(
       queenInfoId, changeQueenId, QueenInfo queenInfo) async {
