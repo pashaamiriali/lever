@@ -28,7 +28,11 @@ class AddHiveView extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
-                          TakeImageSection(model: model),
+                          TakeImageSection(
+                            setData: (key, value) {
+                              setModelData(model, key, value);
+                            },
+                          ),
                           SizedBox(
                             height: 20,
                           ),
@@ -36,31 +40,55 @@ class AddHiveView extends StatelessWidget {
                           SizedBox(
                             height: 20,
                           ),
-                          BreedSection(model: model),
+                          BreedSection(
+                            setData: (key, value) {
+                              setModelData(model, key, value);
+                            },
+                          ),
                           SizedBox(
                             height: 20,
                           ),
-                          QueenEnterDateSection(model: model),
+                          QueenEnterDateSection(
+                            setData: (key, value) {
+                              setModelData(model, key, value);
+                            },
+                          ),
                           SizedBox(
                             height: 20,
                           ),
-                          QueenBackColorSection(model: model),
+                          QueenBackColorSection(
+                            setData: (key, value) {
+                              setModelData(model, key, value);
+                            },
+                          ),
                           SizedBox(
                             height: 20,
                           ),
-                          FrameStairsSection(model: model),
+                          FrameStairsSection(setData: (key, value) {
+                              setModelData(model, key, value);
+                            },
+                          ),
                           SizedBox(
                             height: 20,
                           ),
-                          StatusSection(model: model),
+                          StatusSection(setData: (key, value) {
+                              setModelData(model, key, value);
+                            },
+                          ),
                           SizedBox(
                             height: 20,
                           ),
-                          AnnualHoneySection(model: model),
+                          AnnualHoneySection(
+                            setData: (key, value) {
+                              setModelData(model, key, value);
+                            },
+                          ),
                           SizedBox(
                             height: 20,
                           ),
-                          NotesSection(model: model),
+                          NotesSection(setData: (key, value) {
+                            setModelData(model, key, value);
+                          }),
                           SizedBox(
                             height: 250,
                           )
@@ -127,7 +155,31 @@ class AddHiveView extends StatelessWidget {
                       showDialog(
                           context: context,
                           builder: (context) => AlertDialog(
-                                content: Text('انجام شد'),
+                                scrollable: true,
+                                title: Text(
+                                  'ذخیره شد',
+                                  textAlign: TextAlign.right,
+                                  textDirection: TextDirection.rtl,
+                                ),
+                                content: Center(
+                                  child: Column(
+                                    children: [
+                                      Text(
+                                        'کد QR کندو در گالری ذخیره شد. لطفا بعد از پرینت کردن آن را روی کندو بچسبانید تا برای دسترسی راحت تر اسکن کنید',
+                                        textAlign: TextAlign.right,
+                                        textDirection: TextDirection.rtl,
+                                      ),
+                                      Text(
+                                        'لطفا شماره کندو(' +
+                                            model.hiveInfo['hiveNumber']
+                                                .toString() +
+                                            ') را روی کندو بنویسید تا فراموش نشود',
+                                        textAlign: TextAlign.right,
+                                        textDirection: TextDirection.rtl,
+                                      )
+                                    ],
+                                  ),
+                                ),
                                 actions: [
                                   MaterialButton(
                                     onPressed: () {
@@ -147,5 +199,17 @@ class AddHiveView extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  void setModelData(AddHiveViewLogic model, String key, value) {
+    model.hiveInfo[key] = value;
+  }
+
+  void setInValid(AddHiveViewLogic model, String fieldName) {
+    model.invalidFields.add(fieldName);
+  }
+
+  void removeInValid(AddHiveViewLogic model, String fieldName) {
+    model.invalidFields.remove(fieldName);
   }
 }

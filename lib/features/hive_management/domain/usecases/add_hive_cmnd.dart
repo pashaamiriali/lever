@@ -8,6 +8,7 @@ class AddHiveCmnd extends Command {
 
   AddHiveCmnd(this._hiveRepo);
 
+//map: {'hive': hive, 'population_info': populationInfo, 'queen_info': queenInfo}
   @override
   Future<Hive> execute(Map<String, dynamic> args) async {
     if (args.length != 3 ||

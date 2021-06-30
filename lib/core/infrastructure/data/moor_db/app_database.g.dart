@@ -342,7 +342,7 @@ class $TChangeQueensTable extends TChangeQueens
   }
 
   @override
-  Set<GeneratedColumn> get $primaryKey => <GeneratedColumn>{};
+  Set<GeneratedColumn> get $primaryKey => {id};
   @override
   TChangeQueen map(Map<String, dynamic> data, {String tablePrefix}) {
     return TChangeQueen.fromData(data, _db,
@@ -894,7 +894,7 @@ class $THarvestHoneysTable extends THarvestHoneys
   }
 
   @override
-  Set<GeneratedColumn> get $primaryKey => <GeneratedColumn>{};
+  Set<GeneratedColumn> get $primaryKey => {id};
   @override
   THarvestHoney map(Map<String, dynamic> data, {String tablePrefix}) {
     return THarvestHoney.fromData(data, _db,
@@ -1247,7 +1247,7 @@ class $THivesTable extends THives with TableInfo<$THivesTable, THive> {
   }
 
   @override
-  Set<GeneratedColumn> get $primaryKey => <GeneratedColumn>{};
+  Set<GeneratedColumn> get $primaryKey => {id};
   @override
   THive map(Map<String, dynamic> data, {String tablePrefix}) {
     return THive.fromData(data, _db,
@@ -1594,7 +1594,7 @@ class $TPopulationInfosTable extends TPopulationInfos
   }
 
   @override
-  Set<GeneratedColumn> get $primaryKey => <GeneratedColumn>{};
+  Set<GeneratedColumn> get $primaryKey => {id};
   @override
   TPopulationInfo map(Map<String, dynamic> data, {String tablePrefix}) {
     return TPopulationInfo.fromData(data, _db,
@@ -1944,7 +1944,7 @@ class $TQueenInfosTable extends TQueenInfos
   }
 
   @override
-  Set<GeneratedColumn> get $primaryKey => <GeneratedColumn>{};
+  Set<GeneratedColumn> get $primaryKey => {id};
   @override
   TQueenInfo map(Map<String, dynamic> data, {String tablePrefix}) {
     return TQueenInfo.fromData(data, _db,
@@ -2451,7 +2451,7 @@ class $TRegularVisitsTable extends TRegularVisits
   }
 
   @override
-  Set<GeneratedColumn> get $primaryKey => <GeneratedColumn>{};
+  Set<GeneratedColumn> get $primaryKey => {id};
   @override
   TRegularVisit map(Map<String, dynamic> data, {String tablePrefix}) {
     return TRegularVisit.fromData(data, _db,

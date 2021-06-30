@@ -111,4 +111,19 @@ class AppDatabase extends _$AppDatabase {
   Future<void> deleteHive(String hiveId) async {
     await (delete(tHives)..where((tbl) => tbl.id.equals(hiveId))).go();
   }
+
+  Future<void> updateHive(THive hive) async {
+    await update(tHives).replace(hive);
+  }
+  Future<void> updatePopulationInfo(TPopulationInfo populationInfo) async {
+    await update(tPopulationInfos).replace(populationInfo);
+  }
+  Future<void> updateQueenInfo(TQueenInfo queenInfo) async {
+    await update(tQueenInfos).replace(queenInfo);
+  }
+  Future<THive> getHive(String hiveId)async{
+    return await  (select(tHives)
+          ..where((tbl) => tbl.id.equals(hiveId)))
+        .getSingle();
+  }
 }

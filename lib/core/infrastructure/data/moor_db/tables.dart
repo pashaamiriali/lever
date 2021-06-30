@@ -7,10 +7,12 @@ class TChangeQueens extends Table {
   DateTimeColumn get date => dateTime()();
   TextColumn get pictures => text()();
   TextColumn get description => text()();
+    @override
+  Set<Column> get primaryKey => {id};
 }
 
 class THarvestHoneys extends Table {
-  TextColumn get id => text()();
+  TextColumn get id =>  text()();
   TextColumn get hiveId => text()();
   DateTimeColumn get date => dateTime()();
   TextColumn get pictures => text()();
@@ -19,6 +21,8 @@ class THarvestHoneys extends Table {
   IntColumn get frames => integer()();
   IntColumn get weight => integer()();
   TextColumn get quality => text()();
+  @override
+  Set<Column> get primaryKey => {id};
 }
 
 class THives extends Table {
@@ -27,6 +31,8 @@ class THives extends Table {
   IntColumn get annualHoney => integer()();
   TextColumn get description => text()();
   TextColumn get picture => text()();
+    @override
+  Set<Column> get primaryKey => {id};
 }
 
 class TPopulationInfos extends Table {
@@ -35,6 +41,8 @@ class TPopulationInfos extends Table {
   IntColumn get frames => integer()();
   IntColumn get stairs => integer()();
   TextColumn get status => text()();
+    @override
+  Set<Column> get primaryKey => {id};
 }
 
 class TQueenInfos extends Table {
@@ -43,6 +51,8 @@ class TQueenInfos extends Table {
   DateTimeColumn get enterDate => dateTime()();
   TextColumn get breed => text()();
   TextColumn get backColor => text()();
+    @override
+  Set<Column> get primaryKey => {id};
 }
 
 class TRegularVisits extends Table {
@@ -54,4 +64,6 @@ class TRegularVisits extends Table {
   TextColumn get behavior => text()();
   BoolColumn get queenSeen => boolean()();
   TextColumn get honeyMaking => text()();
+    @override
+  Set<Column> get primaryKey => {id};
 }

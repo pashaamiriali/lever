@@ -20,9 +20,8 @@ class HiveRepoImpl extends HiveRepo {
   Future<List<Hive>> fetchHives() async {
     List<Hive> hivesList = [];
     var rawHives = await this._appDatabase.allHives;
-    rawHives.map((e) async {
-      return hivesList.add(await _hiveFromHiveTable(e));
-    }).toList();
+    for (THive rawHive in rawHives)
+      hivesList.add(await _hiveFromHiveTable(rawHive));
     return hivesList;
   }
 
@@ -64,6 +63,47 @@ class HiveRepoImpl extends HiveRepo {
   @override
   Future<void> deleteHive(String hiveId) async {
     await this._appDatabase.deleteHive(hiveId);
+  }
+
+  @override
+  Future<void> editHive(Hive hive) async {
+    await this._appDatabase.updateHive(
+          THive(
+              id: hive.id,
+              number: hive.number,
+              annualHoney: hive.annualHoney,
+              description: hive.description,
+              picture: hive.picture),
+        );
+  }
+
+  @override
+  editPopulationInfo(PopulationInfo populationInfo) async {
+    await this._appDatabase.updatePopulationInfo(
+          TPopulationInfo(
+              id: populationInfo.id,
+              regularVisitId: populationInfo.regularVisitId,
+              frames: populationInfo.frames,
+              stairs: populationInfo.stairs,
+              status: populationInfo.status),
+        );
+  }
+
+  @override
+  editQueenInfo(QueenInfo queenInfo) async {
+    await this._appDatabase.updateQueenInfo(
+          TQueenInfo(
+              id: queenInfo.id,
+              changeQueenId: queenInfo.changeQueenId,
+              enterDate: queenInfo.enterDate,
+              breed: queenInfo.breed,
+              backColor: queenInfo.backColor),
+        );
+  }
+
+  @override
+  fetchHive(String hiveId) async {
+    return await _hiveFromHiveTable(await this._appDatabase.getHive(hiveId));
   }
 
   Hive _generateCompleteHive(
@@ -180,39 +220,39 @@ class HiveRepoImpl extends HiveRepo {
     var _rawRegularVisits = await this._appDatabase.allRegularVisits;
     var _rawChangeQueens = await this._appDatabase.allChangeQueens;
     var _rawHarvestHoneys = await this._appDatabase.allHarvestHoneys;
-    _rawRegularVisits.map((e) async {
+    for (TRegularVisit regularVisit in _rawRegularVisits)
       visits.add(RegularVisit(
-          e.id,
-          e.hiveId,
-          e.date,
-          (json.decode(e.pictures) as List<dynamic>).cast<String>(),
-          e.description,
-          e.behavior,
-          e.queenSeen,
-          e.honeyMaking,
-          await getPopulationInfo(e.id)));
-    }).toList();
-    _rawChangeQueens.map((e) async {
+          regularVisit.id,
+          regularVisit.hiveId,
+          regularVisit.date,
+          (json.decode(regularVisit.pictures) as List<dynamic>).cast<String>(),
+          regularVisit.description,
+          regularVisit.behavior,
+          regularVisit.queenSeen,
+          regularVisit.honeyMaking,
+          await getPopulationInfo(regularVisit.id)));
+
+    for (TChangeQueen changeQueen in _rawChangeQueens)
       visits.add(ChangeQueen(
-          e.id,
-          e.hiveId,
-          e.date,
-          (json.decode(e.pictures) as List<dynamic>).cast<String>(),
-          e.description,
-          await getQueenInfo(e.id)));
-    }).toList();
-    _rawHarvestHoneys.map((e) async {
+          changeQueen.id,
+          changeQueen.hiveId,
+          changeQueen.date,
+          (json.decode(changeQueen.pictures) as List<dynamic>).cast<String>(),
+          changeQueen.description,
+          await getQueenInfo(changeQueen.id)));
+
+    for (THarvestHoney harvestHoney in _rawHarvestHoneys)
       visits.add(HarvestHoney(
-          e.id,
-          e.hiveId,
-          e.date,
-          (json.decode(e.pictures) as List<dynamic>).cast<String>(),
-          e.description,
-          e.describedAmount,
-          e.frames,
-          e.weight,
-          e.quality));
-    }).toList();
+          harvestHoney.id,
+          harvestHoney.hiveId,
+          harvestHoney.date,
+          (json.decode(harvestHoney.pictures) as List<dynamic>).cast<String>(),
+          harvestHoney.description,
+          harvestHoney.describedAmount,
+          harvestHoney.frames,
+          harvestHoney.weight,
+          harvestHoney.quality));
+
     visits.sort((a, b) => a.date.compareTo(b.date));
     return visits;
   }

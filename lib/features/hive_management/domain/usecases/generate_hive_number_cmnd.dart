@@ -5,6 +5,7 @@ class GenerateHiveNumberCmnd extends Command {
   final HiveRepo _hiveRepo;
 
   GenerateHiveNumberCmnd(this._hiveRepo);
+  //map: void
   @override
   Future<int> execute(Map<String, dynamic> args) async {
     int lastHiveNumber = await _hiveRepo.fetchLastHiveNumber();

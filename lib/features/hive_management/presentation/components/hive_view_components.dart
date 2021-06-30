@@ -9,10 +9,10 @@ import 'package:lever/features/hive_management/presentation/logic/hive_add_view_
 import 'package:shamsi_date/extensions.dart';
 
 class NotesSection extends StatefulWidget {
-  final AddHiveViewLogic model;
+  final Function setData;
   const NotesSection({
     Key key,
-    this.model,
+    @required this.setData,
   }) : super(key: key);
 
   @override
@@ -26,9 +26,23 @@ class _NotesSectionState extends State<NotesSection> {
     super.initState();
     notesController = TextEditingController();
     notesController.addListener(() {
-      widget.model.description = notesController.text;
+      widget.setData('description', notesController.text);
     });
   }
+
+  @override
+  Widget build(BuildContext context) {
+    return NotesInput(notesController: notesController);
+  }
+}
+
+class NotesInput extends StatelessWidget {
+  const NotesInput({
+    Key key,
+    @required this.notesController,
+  }) : super(key: key);
+
+  final TextEditingController notesController;
 
   @override
   Widget build(BuildContext context) {
@@ -55,10 +69,10 @@ class _NotesSectionState extends State<NotesSection> {
 }
 
 class AnnualHoneySection extends StatefulWidget {
-  final AddHiveViewLogic model;
+  final Function setData;
   const AnnualHoneySection({
     Key key,
-    this.model,
+    @required this.setData,
   }) : super(key: key);
 
   @override
@@ -67,16 +81,22 @@ class AnnualHoneySection extends StatefulWidget {
 
 class _AnnualHoneySectionState extends State<AnnualHoneySection> {
   TextEditingController annualHoneyController;
+  String lastValidValue = '';
   @override
   void initState() {
     annualHoneyController = TextEditingController();
     annualHoneyController.addListener(() {
+      if (annualHoneyController.text.isEmpty) return;
       if (validateField(annualHoneyController.text)) {
-        widget.model.annualHoney = int.parse(annualHoneyController.text);
-        widget.model.invalidFields.remove('annualHoney');
+        widget.setData('annualHoney', int.parse(annualHoneyController.text));
+
+        setState(() {
+          lastValidValue = annualHoneyController.text;
+        });
       } else {
-        if (widget.model.invalidFields.contains('annualHoney'))
-          widget.model.invalidFields.add('annualHoney');
+        setState(() {
+          annualHoneyController.text = lastValidValue;
+        });
       }
     });
     super.initState();
@@ -84,18 +104,7 @@ class _AnnualHoneySectionState extends State<AnnualHoneySection> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.end,
-      children: [
-        InputTitle(text: 'عسل سالیانه'),
-        CustomTextField(
-          widthInPercent: 0.4,
-          hintText: 'وزن به کیلو',
-          controller: TextEditingController(),
-          inputType: TextInputType.number,
-        ),
-      ],
-    );
+    return AnnualHoneyInput(annualHoneyController: annualHoneyController);
   }
 
   bool validateField(String value) {
@@ -108,11 +117,36 @@ class _AnnualHoneySectionState extends State<AnnualHoneySection> {
   }
 }
 
+class AnnualHoneyInput extends StatelessWidget {
+  const AnnualHoneyInput({
+    Key key,
+    @required this.annualHoneyController,
+  }) : super(key: key);
+
+  final TextEditingController annualHoneyController;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.end,
+      children: [
+        InputTitle(text: 'عسل سالیانه'),
+        CustomTextField(
+          widthInPercent: 0.4,
+          hintText: 'وزن به کیلو',
+          controller: annualHoneyController,
+          inputType: TextInputType.number,
+        ),
+      ],
+    );
+  }
+}
+
 class StatusSection extends StatefulWidget {
-  final AddHiveViewLogic model;
+  final Function setData;
   const StatusSection({
     Key key,
-    this.model,
+    @required this.setData,
   }) : super(key: key);
 
   @override
@@ -128,26 +162,28 @@ class _StatusSectionState extends State<StatusSection> {
       children: [
         InputTitle(text: 'وضعیت'),
         DropdownButton(
-          value: _dropdownValue,
-            onChanged: (value) {
-              setState(() {
-                widget.model.status = value;
-                _dropdownValue = value;
-              });
-            },
+            value: _dropdownValue,
+            onChanged: (value) => _valueChanged(value),
             items: <String>['قوی', 'متوسط', 'ضعیف', 'بیمار']
                 .map((e) => DropdownMenuItem<String>(value: e, child: Text(e)))
                 .toList())
       ],
     );
   }
+
+  void _valueChanged(dynamic value) {
+    setState(() {
+      widget.setData('status', value);
+      _dropdownValue = value;
+    });
+  }
 }
 
 class FrameStairsSection extends StatefulWidget {
-  final AddHiveViewLogic model;
+  final Function setData;
   const FrameStairsSection({
     Key key,
-    this.model,
+    @required this.setData,
   }) : super(key: key);
 
   @override
@@ -157,26 +193,35 @@ class FrameStairsSection extends StatefulWidget {
 class _FrameStairsSectionState extends State<FrameStairsSection> {
   TextEditingController framesController;
   TextEditingController stairsController;
+  String lastFramesData = '';
+  String lastStairsData = '';
   @override
   void initState() {
     framesController = TextEditingController();
     stairsController = TextEditingController();
     framesController.addListener(() {
+      if (framesController.text.isEmpty) return;
       if (validateField(framesController.text)) {
-        widget.model.frames = int.parse(framesController.text);
-        widget.model.invalidFields.remove('frames');
-      } else {
-        if (widget.model.invalidFields.contains('frames'))
-          widget.model.invalidFields.add('frames');
-      }
+        widget.setData('frames', int.parse(framesController.text));
+        setState(() {
+          lastFramesData = framesController.text;
+        });
+      } else
+        setState(() {
+          framesController.text = lastFramesData;
+        });
     });
     stairsController.addListener(() {
+      if (stairsController.text.isEmpty) return;
       if (validateField(stairsController.text)) {
-        widget.model.stairs = int.parse(stairsController.text);
-        widget.model.invalidFields.remove('stairs');
+        widget.setData('stairs', int.parse(stairsController.text));
+        setState(() {
+          lastStairsData = stairsController.text;
+        });
       } else {
-        if (widget.model.invalidFields.contains('stairs'))
-          widget.model.invalidFields.add('stairs');
+        setState(() {
+          stairsController.text = lastStairsData;
+        });
       }
     });
     super.initState();
@@ -188,8 +233,9 @@ class _FrameStairsSectionState extends State<FrameStairsSection> {
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
         InputTitle(text: 'قاب/طبق'),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.end,
+        Wrap(
+          crossAxisAlignment: WrapCrossAlignment.end,
+          runSpacing: 10,
           children: [
             CustomTextField(
               widthInPercent: 0.4,
@@ -223,11 +269,10 @@ class _FrameStairsSectionState extends State<FrameStairsSection> {
 }
 
 class QueenBackColorSection extends StatefulWidget {
-  final AddHiveViewLogic model;
-  const QueenBackColorSection({
-    Key key,
-    this.model,
-  }) : super(key: key);
+  final Function setData;
+
+  const QueenBackColorSection({Key key, @required this.setData})
+      : super(key: key);
 
   @override
   _QueenBackColorSectionState createState() => _QueenBackColorSectionState();
@@ -245,7 +290,7 @@ class _QueenBackColorSectionState extends State<QueenBackColorSection> {
           value: _dropdownValue,
           onChanged: (value) {
             setState(() {
-              widget.model.queenBackColor = value.toString();
+              widget.setData('queenBackColor', value.toString());
               _dropdownValue = value;
             });
           },
@@ -297,10 +342,10 @@ String getColorNameFromCode(int colorCode) {
 }
 
 class QueenEnterDateSection extends StatefulWidget {
-  final AddHiveViewLogic model;
+  final Function setData;
   const QueenEnterDateSection({
     Key key,
-    this.model,
+    @required this.setData,
   }) : super(key: key);
 
   @override
@@ -309,18 +354,50 @@ class QueenEnterDateSection extends StatefulWidget {
 
 class _QueenEnterDateSectionState extends State<QueenEnterDateSection> {
   TextEditingController _dayController, _monthController, _yearController;
+  Jalali _queenAddedDate = Jalali.now();
+  String _lastDayValue, _lastMonthValue, _lastYearValue;
   @override
   void initState() {
     super.initState();
     _dayController = TextEditingController();
     _monthController = TextEditingController();
     _yearController = TextEditingController();
-    _dayController
-        .addListener(() => _listenForValidation(_validateDayField, 'day'));
-    _monthController
-        .addListener(() => _listenForValidation(_validateMonthField, 'month'));
-    _yearController
-        .addListener(() => _listenForValidation(_validateYearField, 'year'));
+    _lastDayValue = '';
+    _lastMonthValue = '';
+    _lastYearValue = '';
+    _dayController.addListener(() {
+      if (_dayController.text.isEmpty) return;
+      if (_validateDayField())
+        setState(() {
+          _lastDayValue = _dayController.text;
+        });
+      else
+        setState(() {
+          _dayController.text = _lastDayValue;
+        });
+    });
+    _monthController.addListener(() {
+      if (_monthController.text.isEmpty) return;
+      if (_validateMonthField())
+        setState(() {
+          _lastMonthValue = _monthController.text;
+        });
+      else
+        setState(() {
+          _monthController.text = _lastMonthValue;
+        });
+    });
+    _yearController.addListener(() {
+      if (_yearController.text.isEmpty) return;
+      if (_validateYearField())
+        setState(() {
+          _lastYearValue = _yearController.text;
+        });
+      else
+        setState(() {
+          _yearController.text = _lastYearValue;
+        });
+    });
   }
 
   @override
@@ -329,51 +406,25 @@ class _QueenEnterDateSectionState extends State<QueenEnterDateSection> {
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
         InputTitle(text: 'تاریخ ورود ملکه'),
-        Wrap(
-          children: [
-            CustomTextField(
-              widthInPercent: 0.3,
-              hintText: 'سال',
-              controller: _yearController,
-              inputType: TextInputType.number,
-            ),
-            SizedBox(
-              width: 10,
-            ),
-            CustomTextField(
-              widthInPercent: 0.3,
-              hintText: 'ماه',
-              controller: _monthController,
-              inputType: TextInputType.number,
-            ),
-            SizedBox(
-              width: 10,
-            ),
-            CustomTextField(
-              widthInPercent: 0.3,
-              hintText: 'روز',
-              controller: _dayController,
-              inputType: TextInputType.number,
-            ),
-          ],
-        ),
+        DateInput(
+            yearController: _yearController,
+            monthController: _monthController,
+            dayController: _dayController),
       ],
     );
-  }
-
-  void _listenForValidation(Function validator, String fieldName) {
-    if (!validator())
-      widget.model.invalidFields.add(fieldName);
-    else if (widget.model.invalidFields.contains(fieldName))
-      widget.model.invalidFields.remove(fieldName);
   }
 
   bool _validateDayField() {
     try {
       int day = int.parse(_dayController.text);
-      if (day > 0 && day < 32)
+      if (day > 0 && day < 32) {
+        setState(() {
+          _queenAddedDate =
+              Jalali(_queenAddedDate.year, _queenAddedDate.month, day);
+          widget.setData('queenAddedDate', _queenAddedDate.toDateTime());
+        });
         return true;
-      else
+      } else
         return false;
     } catch (e) {
       return false;
@@ -383,9 +434,14 @@ class _QueenEnterDateSectionState extends State<QueenEnterDateSection> {
   bool _validateMonthField() {
     try {
       int month = int.parse(_monthController.text);
-      if (month > 0 && month < 13)
+      if (month > 0 && month < 13) {
+        setState(() {
+          _queenAddedDate =
+              Jalali(_queenAddedDate.year, month, _queenAddedDate.day);
+          widget.setData('queenAddedDate', _queenAddedDate.toDateTime());
+        });
         return true;
-      else
+      } else
         return false;
     } catch (e) {
       return false;
@@ -395,9 +451,14 @@ class _QueenEnterDateSectionState extends State<QueenEnterDateSection> {
   bool _validateYearField() {
     try {
       int year = int.parse(_yearController.text);
-      if (year > 0 && year < Jalali.now().year + 1)
+      if (year > 0 && year < Jalali.now().year + 1) {
+        setState(() {
+          _queenAddedDate =
+              Jalali(year, _queenAddedDate.month, _queenAddedDate.day);
+          widget.setData('queenAddedDate', _queenAddedDate.toDateTime());
+        });
         return true;
-      else
+      } else
         return false;
     } catch (e) {
       return false;
@@ -405,12 +466,57 @@ class _QueenEnterDateSectionState extends State<QueenEnterDateSection> {
   }
 }
 
-class BreedSection extends StatefulWidget {
-  final AddHiveViewLogic model;
-  const BreedSection({
+class DateInput extends StatelessWidget {
+  const DateInput({
     Key key,
-    this.model,
-  }) : super(key: key);
+    @required TextEditingController yearController,
+    @required TextEditingController monthController,
+    @required TextEditingController dayController,
+  })  : _yearController = yearController,
+        _monthController = monthController,
+        _dayController = dayController,
+        super(key: key);
+
+  final TextEditingController _yearController;
+  final TextEditingController _monthController;
+  final TextEditingController _dayController;
+
+  @override
+  Widget build(BuildContext context) {
+    return Wrap(
+      children: [
+        CustomTextField(
+          widthInPercent: 0.3,
+          hintText: 'سال',
+          controller: _yearController,
+          inputType: TextInputType.number,
+        ),
+        SizedBox(
+          width: 10,
+        ),
+        CustomTextField(
+          widthInPercent: 0.3,
+          hintText: 'ماه',
+          controller: _monthController,
+          inputType: TextInputType.number,
+        ),
+        SizedBox(
+          width: 10,
+        ),
+        CustomTextField(
+          widthInPercent: 0.3,
+          hintText: 'روز',
+          controller: _dayController,
+          inputType: TextInputType.number,
+        ),
+      ],
+    );
+  }
+}
+
+class BreedSection extends StatefulWidget {
+  final Function setData;
+  const BreedSection({Key key, @required this.setData}) : super(key: key);
 
   @override
   _BreedSectionState createState() => _BreedSectionState();
@@ -426,7 +532,7 @@ class _BreedSectionState extends State<BreedSection> {
   }
 
   void _setModelText() {
-    widget.model.breed = _controller.text;
+    widget.setData('breed', _controller.text);
   }
 
   @override
@@ -500,10 +606,10 @@ class _HiveNumberSectionState extends State<HiveNumberSection> {
 }
 
 class TakeImageSection extends StatefulWidget {
-  final AddHiveViewLogic model;
+  final Function setData;
   const TakeImageSection({
     Key key,
-    this.model,
+    @required this.setData,
   }) : super(key: key);
 
   @override
@@ -556,7 +662,7 @@ class _TakeImageSectionState extends State<TakeImageSection> {
   void imageCapturedCallback(String imagePath) {
     setState(() {
       this._picture = File(imagePath);
-      widget.model.picture = imagePath;
+      widget.setData('picture', imagePath);
     });
   }
 }

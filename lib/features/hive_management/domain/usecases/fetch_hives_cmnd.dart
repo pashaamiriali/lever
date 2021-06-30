@@ -6,6 +6,7 @@ class FetchHivesCmnd  extends Command{
  final HiveRepo _hiveRepo;
 
   FetchHivesCmnd(this._hiveRepo);
+  //map: void
   @override
  Future<List<Hive>> execute(Map<String, dynamic> args) async {
     return await _hiveRepo.fetchHives();

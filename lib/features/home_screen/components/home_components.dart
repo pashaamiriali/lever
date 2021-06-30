@@ -1,14 +1,18 @@
 import 'dart:io';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:lever/core/components/global_view_components.dart';
+import 'package:lever/features/app/presentation/logic/app_view_logic.dart';
 import 'package:lever/features/hive_management/domain/entities/entities.dart';
-import 'package:lever/features/hive_management/presentation/logic/hive_add_view_logic.dart';
 import 'package:lever/features/home_screen/logic/home_screen_model.dart';
+import 'package:provider/provider.dart';
+import 'package:shamsi_date/shamsi_date.dart';
 
 class HomeHivesList extends StatelessWidget {
   final HomeScreenModel model;
+
   const HomeHivesList({Key key, this.model}) : super(key: key);
 
   @override
@@ -57,113 +61,120 @@ class HomeHivesListItem extends StatefulWidget {
 }
 
 class _HomeHivesListItemState extends State<HomeHivesListItem> {
-  bool _showContext = false;
+  bool _showContextMenu = false;
   bool _isLoading = false;
+
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: EdgeInsets.symmetric(vertical: 8),
       padding: EdgeInsets.all(8),
+      margin: EdgeInsets.only(bottom:10),
       decoration: BoxDecoration(
         border: Border.all(
           color: Theme.of(context).colorScheme.onBackground,
           width: 1,
           style: BorderStyle.solid,
         ),
+        image:  (widget.hive.picture != null && widget.hive.picture.isNotEmpty)?DecorationImage(
+          image: FileImage(
+            File(widget.hive.picture),
+          ),fit: BoxFit.cover,
+        ):null,
         borderRadius: BorderRadius.circular(33),
         color: Colors.transparent,
       ),
-      child: _isLoading?CircularProgressIndicator(): InkWell(
-        onLongPress: () {
-          setState(() {
-            _showContext = true;
-          });
-        },
-        child: _showContext
-            ? Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  MaterialButton(
-                    onPressed: () {
-                      setState(() {
-                        _showContext = false;
-                      });
-                    },
-                    child: Icon(Icons.arrow_back_rounded),
+      child: _isLoading
+          ? CircularProgressIndicator()
+          : InkWell(
+              onTap: () {
+                Provider.of<AppLogic>(context, listen: false).selectedHiveId =
+                    widget.hive.id;
+                Navigator.of(context).pushReplacementNamed('hiveDetails');
+              },
+              onLongPress: () {
+                setState(() {
+                  _showContextMenu = true;
+                });
+              },
+              child: _showContextMenu
+                  ? Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        MaterialButton(
+                          onPressed: () {
+                            setState(() {
+                              _showContextMenu = false;
+                            });
+                          },
+                          child: Icon(Icons.arrow_back_rounded),
+                        ),
+                        MaterialButton(
+                          onPressed: () {
+                            showDialog(
+                                context: context,
+                                builder: (context) {
+                                  return AlertDialog(
+                                    title: Text('حذف کندو'),
+                                    content: Text('آیا از حذف کندو مطمئنید؟'),
+                                    actions: [
+                                      CancelButton(
+                                        onPressed: () {
+                                          Navigator.of(context).pop();
+                                        },
+                                        child: Text('لغو'),
+                                      ),
+                                      PrimaryButton(
+                                        onPressed: () {
+                                          setState(() {
+                                            _isLoading = true;
+                                            widget.model.deleteHive(widget.hive.id);
+                                          });
+                                          Navigator.of(context).pop();
+                                        },
+                                        child: Text('حذف'),
+                                      ),
+                                    ],
+                                  );
+                                });
+
+                          },
+                          child: Row(
+                            children: [Icon(Icons.delete), Text('حذف')],
+                          ),
+                        )
+                      ],
+                    )
+                  : Center(
+                    child: Wrap(
+                        crossAxisAlignment: WrapCrossAlignment.center,
+                        children: [
+                          Column(
+                            children: [
+                              Text('وضعیت: ' + widget.hive.populationInfo.status,),
+                              Text('آخرین بازدید: ' + _getLastVisitDate())
+                            ],
+                          ),
+                          Text(
+                            widget.hive.number.toString(),
+                            style: Theme.of(context).textTheme.headline4,
+                          ),
+                        ],
+                      ),
                   ),
-                  MaterialButton(
-                    onPressed: () {
-                      setState(() {
-                        _isLoading = true;
-                        widget.model.deleteHive(widget.hive.id);
-                      });
-                    },
-                    child: Row(
-                      children: [Icon(Icons.delete), Text('حذف')],
-                    ),
-                  )
-                ],
-              )
-            : Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  Column(
-                    children: [
-                      Text('وضعیت:' + widget.hive.populationInfo.status),
-                      Text('آخرین بازدید:' +
-                          widget.hive.visits.first.date.toString())
-                    ],
-                  ),
-                  Text(
-                    widget.hive.number.toString(),
-                    style: Theme.of(context).textTheme.headline4,
-                  ),
-                  Align(
-                      alignment: Alignment.centerRight,
-                      child: this._showHivePicture(widget.hive, context)),
-                ],
-              ),
-      ),
+            ),
     );
   }
 
-  Widget _showHivePicture(Hive hive, BuildContext context) {
-    if (hive.picture != null && hive.picture.isNotEmpty) {
-      return Container(
-        width: 60,
-        height: 60,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(55),
-          image: DecorationImage(
-            image: FileImage(
-              File(hive.picture),
-            ),
-          ),
-          border: Border.all(
-            color: Theme.of(context).colorScheme.onBackground,
-            width: 1,
-            style: BorderStyle.solid,
-          ),
-        ),
-      );
-    } else {
-      return Container(
-        width: 60,
-        height: 60,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(55),
-          border: Border.all(
-            color: Theme.of(context).colorScheme.onBackground,
-            width: 1,
-            style: BorderStyle.solid,
-          ),
-        ),
-        child: Center(
-          child: Text('N/A'),
-        ),
-      );
-    }
+  String _getLastVisitDate() {
+    Jalali date = Jalali.fromDateTime(widget.hive.visits.first.date);
+    return date.year.toString() +
+        '/' +
+        date.month.toString() +
+        '/' +
+        date.day.toString();
   }
+
+
 }
 
 class HomeBottomNavigationBar extends StatelessWidget {

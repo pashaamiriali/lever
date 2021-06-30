@@ -19,6 +19,7 @@ main() {
     MockAppDatabase mockAppDatabase = MockAppDatabase();
     MockIdGen mockIdGen = MockIdGen();
     MockDateTimeProvider mockDateTimeProvider = MockDateTimeProvider();
+    when(mockDateTimeProvider.getCurrentDateTime()).thenReturn(DateTime.now());
     THive exampleHiveRecord = THive(
         id: 'someId123',
         number: 1234,
@@ -34,7 +35,17 @@ main() {
         behavior: 'Calm',
         queenSeen: true,
         honeyMaking: 'Good');
-    TChangeQueen exampleQueenSeenRecord = TChangeQueen(
+    THarvestHoney exampleHarvestHoneyRecord = THarvestHoney(
+        id: 'someId123',
+        hiveId: 'someId123',
+        date: mockDateTimeProvider.getCurrentDateTime(),
+        pictures: '[]',
+        description: 'some desc',
+        describedAmount: 'Good',
+        frames: 4,
+        quality: 'Good',
+        weight: 12);
+    TChangeQueen exampleChangeQueenRecord = TChangeQueen(
         id: 'someId123',
         hiveId: 'someId123',
         date: mockDateTimeProvider.getCurrentDateTime(),
@@ -69,7 +80,17 @@ main() {
           examplePopulationInfoRecord.stairs,
           examplePopulationInfoRecord.status),
     );
-
+    HarvestHoney exampleHarvestHoney = HarvestHoney(
+        exampleHarvestHoneyRecord.id,
+        exampleHarvestHoneyRecord.hiveId,
+        exampleHarvestHoneyRecord.date,
+        (json.decode(exampleHarvestHoneyRecord.pictures) as List<dynamic>)
+            .cast<String>(),
+        exampleHarvestHoneyRecord.description,
+        exampleHarvestHoneyRecord.describedAmount,
+        exampleHarvestHoneyRecord.frames,
+        exampleHarvestHoneyRecord.weight,
+        exampleHarvestHoneyRecord.quality);
     ChangeQueen exampleChangeQueen = ChangeQueen(
       exampleRegularVisitRecord.id,
       exampleRegularVisitRecord.hiveId,
@@ -92,15 +113,158 @@ main() {
         exampleHiveRecord.description,
         exampleHiveRecord.picture,
         exampleRegularVisit.populationInfo,
-        exampleChangeQueen.queenInfo,
-        [exampleRegularVisit, exampleChangeQueen]);
+        exampleChangeQueen.queenInfo, [
+      exampleRegularVisit,
+      exampleChangeQueen,
+      exampleHarvestHoney,
+    ]);
+    when(mockAppDatabase.allHives)
+        .thenAnswer((realInvocation) async => [exampleHiveRecord]);
+    when(mockAppDatabase.getLastPopulationInfo(any))
+        .thenAnswer((realInvocation) async => examplePopulationInfoRecord);
+    when(mockAppDatabase.getLastQueenInfo(any))
+        .thenAnswer((realInvocation) async => exampleQueenInfoRecord);
+    when(mockAppDatabase.allChangeQueens)
+        .thenAnswer((realInvocation) async => [exampleChangeQueenRecord]);
+    when(mockAppDatabase.allRegularVisits)
+        .thenAnswer((realInvocation) async => [exampleRegularVisitRecord]);
+    when(mockAppDatabase.allHarvestHoneys)
+        .thenAnswer((realInvocation) async => [exampleHarvestHoneyRecord]);
+    when(mockAppDatabase.getPopulationInfo(any))
+        .thenAnswer((realInvocation) async => examplePopulationInfoRecord);
+    when(mockAppDatabase.getQueenInfo(any))
+        .thenAnswer((realInvocation) async => exampleQueenInfoRecord);
     test('should return a list of hives', () async {
       HiveRepoImpl hiveRepoImpl =
           HiveRepoImpl(mockAppDatabase, mockIdGen, mockDateTimeProvider);
-      when(mockAppDatabase.allHives)
-          .thenAnswer((realInvocation) async => [exampleHiveRecord]);
       List<Hive> result = await hiveRepoImpl.fetchHives();
       expect(result[0].toMap(), exampleHive.toMap());
+    });
+  });
+  group('fetchHive', () {
+    MockAppDatabase mockAppDatabase = MockAppDatabase();
+    MockIdGen mockIdGen = MockIdGen();
+    MockDateTimeProvider mockDateTimeProvider = MockDateTimeProvider();
+    when(mockDateTimeProvider.getCurrentDateTime()).thenReturn(DateTime.now());
+    THive exampleHiveRecord = THive(
+        id: 'someId123',
+        number: 1234,
+        annualHoney: 60,
+        description: 'some desc',
+        picture: 'aPicture.jpg');
+    TRegularVisit exampleRegularVisitRecord = TRegularVisit(
+        id: 'someId123',
+        hiveId: 'someId123',
+        date: mockDateTimeProvider.getCurrentDateTime(),
+        pictures: '[]',
+        description: 'some desc',
+        behavior: 'Calm',
+        queenSeen: true,
+        honeyMaking: 'Good');
+    THarvestHoney exampleHarvestHoneyRecord = THarvestHoney(
+        id: 'someId123',
+        hiveId: 'someId123',
+        date: mockDateTimeProvider.getCurrentDateTime(),
+        pictures: '[]',
+        description: 'some desc',
+        describedAmount: 'Good',
+        frames: 4,
+        quality: 'Good',
+        weight: 12);
+    TChangeQueen exampleChangeQueenRecord = TChangeQueen(
+        id: 'someId123',
+        hiveId: 'someId123',
+        date: mockDateTimeProvider.getCurrentDateTime(),
+        pictures: '[]',
+        description: 'some desc');
+    TPopulationInfo examplePopulationInfoRecord = TPopulationInfo(
+        id: 'someId123',
+        regularVisitId: 'someId123',
+        frames: 20,
+        stairs: 2,
+        status: 'Strong');
+    TQueenInfo exampleQueenInfoRecord = TQueenInfo(
+        id: 'someId123',
+        changeQueenId: 'someId123',
+        enterDate: mockDateTimeProvider.getCurrentDateTime(),
+        breed: 'Karnika',
+        backColor: 'Black');
+    RegularVisit exampleRegularVisit = RegularVisit(
+      exampleRegularVisitRecord.id,
+      exampleRegularVisitRecord.hiveId,
+      exampleRegularVisitRecord.date,
+      (json.decode(exampleRegularVisitRecord.pictures) as List<dynamic>)
+          .cast<String>(),
+      exampleRegularVisitRecord.description,
+      exampleRegularVisitRecord.behavior,
+      exampleRegularVisitRecord.queenSeen,
+      exampleRegularVisitRecord.honeyMaking,
+      PopulationInfo(
+          examplePopulationInfoRecord.id,
+          examplePopulationInfoRecord.regularVisitId,
+          examplePopulationInfoRecord.frames,
+          examplePopulationInfoRecord.stairs,
+          examplePopulationInfoRecord.status),
+    );
+    HarvestHoney exampleHarvestHoney = HarvestHoney(
+        exampleHarvestHoneyRecord.id,
+        exampleHarvestHoneyRecord.hiveId,
+        exampleHarvestHoneyRecord.date,
+        (json.decode(exampleHarvestHoneyRecord.pictures) as List<dynamic>)
+            .cast<String>(),
+        exampleHarvestHoneyRecord.description,
+        exampleHarvestHoneyRecord.describedAmount,
+        exampleHarvestHoneyRecord.frames,
+        exampleHarvestHoneyRecord.weight,
+        exampleHarvestHoneyRecord.quality);
+    ChangeQueen exampleChangeQueen = ChangeQueen(
+      exampleRegularVisitRecord.id,
+      exampleRegularVisitRecord.hiveId,
+      exampleRegularVisitRecord.date,
+      (json.decode(exampleRegularVisitRecord.pictures) as List<dynamic>)
+          .cast<String>(),
+      exampleRegularVisitRecord.description,
+      QueenInfo(
+          exampleQueenInfoRecord.id,
+          exampleQueenInfoRecord.changeQueenId,
+          exampleQueenInfoRecord.enterDate,
+          exampleQueenInfoRecord.breed,
+          exampleQueenInfoRecord.backColor),
+    );
+
+    Hive exampleHive = Hive(
+        exampleHiveRecord.id,
+        exampleHiveRecord.number,
+        exampleHiveRecord.annualHoney,
+        exampleHiveRecord.description,
+        exampleHiveRecord.picture,
+        exampleRegularVisit.populationInfo,
+        exampleChangeQueen.queenInfo, [
+      exampleRegularVisit,
+      exampleChangeQueen,
+      exampleHarvestHoney,
+    ]);
+    when(mockAppDatabase.getHive(any))
+        .thenAnswer((realInvocation) async => exampleHiveRecord);
+    when(mockAppDatabase.getLastPopulationInfo(any))
+        .thenAnswer((realInvocation) async => examplePopulationInfoRecord);
+    when(mockAppDatabase.getLastQueenInfo(any))
+        .thenAnswer((realInvocation) async => exampleQueenInfoRecord);
+    when(mockAppDatabase.allChangeQueens)
+        .thenAnswer((realInvocation) async => [exampleChangeQueenRecord]);
+    when(mockAppDatabase.allRegularVisits)
+        .thenAnswer((realInvocation) async => [exampleRegularVisitRecord]);
+    when(mockAppDatabase.allHarvestHoneys)
+        .thenAnswer((realInvocation) async => [exampleHarvestHoneyRecord]);
+    when(mockAppDatabase.getPopulationInfo(any))
+        .thenAnswer((realInvocation) async => examplePopulationInfoRecord);
+    when(mockAppDatabase.getQueenInfo(any))
+        .thenAnswer((realInvocation) async => exampleQueenInfoRecord);
+    test('should return a hive', () async {
+      HiveRepoImpl hiveRepoImpl =
+          HiveRepoImpl(mockAppDatabase, mockIdGen, mockDateTimeProvider);
+      Hive result = await hiveRepoImpl.fetchHive(exampleHive.id);
+      expect(result.toMap(), exampleHive.toMap());
     });
   });
   group('deleteHive', () {
@@ -117,6 +281,46 @@ main() {
             mockAppDatabase.deleteHive(captureAny),
           ).captured[0],
           hiveId);
+    });
+  });
+  group('editHive', () {
+    MockAppDatabase mockAppDatabase = MockAppDatabase();
+    MockIdGen mockIdGen = MockIdGen();
+    MockDateTimeProvider mockDateTimeProvider = MockDateTimeProvider();
+    test('should call the updateHive method on the database', () async {
+      HiveRepoImpl impl =
+          HiveRepoImpl(mockAppDatabase, mockIdGen, mockDateTimeProvider);
+      await impl
+          .editHive(Hive('someId', null, null, null, null, null, null, null));
+      expect(verify(mockAppDatabase.updateHive(captureAny)).captured[0],
+          TypeMatcher<THive>());
+    });
+  });
+  group('editPopulationInfo', () {
+    MockAppDatabase mockAppDatabase = MockAppDatabase();
+    MockIdGen mockIdGen = MockIdGen();
+    MockDateTimeProvider mockDateTimeProvider = MockDateTimeProvider();
+    test('should call the updatePopulationInfo method on the database',
+        () async {
+      HiveRepoImpl impl =
+          HiveRepoImpl(mockAppDatabase, mockIdGen, mockDateTimeProvider);
+      await impl
+          .editPopulationInfo(PopulationInfo('someId', null, null, null, null));
+      expect(
+          verify(mockAppDatabase.updatePopulationInfo(captureAny)).captured[0],
+          TypeMatcher<TPopulationInfo>());
+    });
+  });
+  group('editQueenInfo', () {
+    MockAppDatabase mockAppDatabase = MockAppDatabase();
+    MockIdGen mockIdGen = MockIdGen();
+    MockDateTimeProvider mockDateTimeProvider = MockDateTimeProvider();
+    test('should call the updateQueenInfo method on the database', () async {
+      HiveRepoImpl impl =
+          HiveRepoImpl(mockAppDatabase, mockIdGen, mockDateTimeProvider);
+      await impl.editQueenInfo(QueenInfo('someId', null, null, null, null));
+      expect(verify(mockAppDatabase.updateQueenInfo(captureAny)).captured[0],
+          TypeMatcher<TQueenInfo>());
     });
   });
 }

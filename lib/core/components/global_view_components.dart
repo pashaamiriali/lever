@@ -139,3 +139,45 @@ class InputTitle extends StatelessWidget {
         child: Text(text, style: Theme.of(context).textTheme.headline6));
   }
 }
+
+class PrimaryButton extends StatelessWidget {
+  const PrimaryButton({
+    Key key,
+    @required this.onPressed,
+    @required this.child,
+  }) : super(key: key);
+
+  final Widget child;
+  final Function onPressed;
+  @override
+  Widget build(BuildContext context) {
+    return MaterialButton(
+      onPressed: onPressed,
+      child: child,
+      shape: StadiumBorder(),
+      color: Theme.of(context).colorScheme.primary,
+      textColor: Theme.of(context).colorScheme.onPrimary,
+    );
+  }
+}
+
+class CancelButton extends StatelessWidget {
+  const CancelButton({
+    Key key,
+    @required this.onPressed,
+    @required this.child,
+  }) : super(key: key);
+
+  final Widget child;
+  final Function onPressed;
+  @override
+  Widget build(BuildContext context) {
+    return MaterialButton(
+      onPressed: onPressed,
+      child: child,
+      shape: StadiumBorder(),
+      color: Theme.of(context).backgroundColor,
+      textColor: Theme.of(context).colorScheme.onBackground,
+    );
+  }
+}

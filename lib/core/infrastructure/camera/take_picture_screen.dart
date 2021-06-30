@@ -142,14 +142,19 @@ class DisplaySingleImageScreen extends StatelessWidget {
               margin: EdgeInsets.only(bottom: 30),
               child: MaterialButton(
                   onPressed: () async {
-                    var appDocumentsPath =
-                        (await getApplicationDocumentsDirectory()).path;
+                    var appDocumentsPath = (await getApplicationSupportDirectory()).path;
                     var imageFile = File(imagePath);
-                    var newPath = join(appDocumentsPath, PICTURES_PATH);
-                    imageFile.copy(newPath).then((value) {
-                      print(value.path);
-                      callBackFunction(value.path);
-                    });
+                    var fileName = imageFile.path.substring(
+                        imageFile.path.indexOf('/CAP'),
+                        imageFile.path.length - 1);
+                    var newPath =
+                        appDocumentsPath + '/' + PICTURES_PATH + fileName;
+                    await Directory(appDocumentsPath + '/' + PICTURES_PATH)
+                        .create();
+                    print(imageFile);
+                    var newImage = await imageFile.copy(newPath);
+                    print(newImage.uri);
+                    callBackFunction(newImage.path);
                     Navigator.of(context).pop();
                   },
                   color: Theme.of(context).colorScheme.primary,
