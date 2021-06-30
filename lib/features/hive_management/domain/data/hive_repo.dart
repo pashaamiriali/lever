@@ -5,6 +5,7 @@ abstract class HiveRepo {
   fetchHives();
   fetchHive(String hiveId);
   fetchLastHiveNumber();
+  fetchVisits(String hiveId);
   deleteHive(String hiveId);
   editHive(Hive hive);
   editPopulationInfo(PopulationInfo populationInfo);

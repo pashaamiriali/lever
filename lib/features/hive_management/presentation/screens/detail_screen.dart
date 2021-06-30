@@ -10,6 +10,7 @@ import 'package:lever/features/app/presentation/logic/app_view_logic.dart';
 import 'package:lever/features/hive_management/domain/entities/entities.dart';
 import 'package:lever/features/hive_management/presentation/components/hive_view_components.dart';
 import 'package:lever/features/hive_management/presentation/logic/hive_details_view_logic.dart';
+import 'package:lever/features/hive_management/presentation/screens/hive_visit_history_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:shamsi_date/extensions.dart';
 
@@ -27,8 +28,10 @@ class _HiveDetailScreenState extends State<HiveDetailScreen> {
   Widget build(BuildContext context) {
     Injector injector = InjectorProvider.of(context).injector;
     return ChangeNotifierProvider<HiveDetailLogic>(
-        create: (context) => HiveDetailLogic(injector.getEditHiveCmnd,
-            injector.getFetchHiveCmnd, injector.getDeleteHiveCmnd),
+        create: (context) => HiveDetailLogic(
+            injector.getEditHiveCmnd,
+            injector.getFetchHiveCmnd,
+            injector.getDeleteHiveCmnd,),
         builder: (context, _) {
           return Consumer<HiveDetailLogic>(builder: (context, model, _) {
             return FutureBuilder<Hive>(
@@ -37,23 +40,29 @@ class _HiveDetailScreenState extends State<HiveDetailScreen> {
                         .selectedHiveId),
                 builder: (context, snapshot) {
                   if (snapshot.hasData) hive = snapshot.data;
-                  return Scaffold(
-                    body: Stack(
-                      children: [
-                        buildTopPanel(context, snapshot, model),
-                        Align(
-                          alignment: Alignment.bottomCenter,
-                          child: buildBottomPanel(context, snapshot),
-                        ),
-                        BottomButtonSet(
-                          onBackPressed: () =>
-                              Navigator.of(context).pushReplacementNamed('/'),
-                          rightActionChild: Icon(Icons.remove_red_eye),
-                          rightAction: () {
-                            //TODO: show visit screen
-                          },
-                        ),
-                      ],
+                  return WillPopScope(
+                    onWillPop: () async {
+                      await Navigator.of(context).pushReplacementNamed('/');
+                      return true;
+                    },
+                    child: Scaffold(
+                      body: Stack(
+                        children: [
+                          buildTopPanel(context, snapshot, model),
+                          Align(
+                            alignment: Alignment.bottomCenter,
+                            child: buildBottomPanel(context, snapshot),
+                          ),
+                          BottomButtonSet(
+                            onBackPressed: () =>
+                                Navigator.of(context).pushReplacementNamed('/'),
+                            rightActionChild: Icon(Icons.remove_red_eye),
+                            rightAction: () {
+                              //TODO: show visit screen
+                            },
+                          ),
+                        ],
+                      ),
                     ),
                   );
                 });
@@ -410,7 +419,11 @@ class _HiveDetailScreenState extends State<HiveDetailScreen> {
     return MaterialButton(
       color: Theme.of(context).colorScheme.background,
       onPressed: () {
-        //TODO: open visit history page
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (_context) => HiveVisitHistoryScreen(),
+          ),
+        );
       },
       shape: StadiumBorder(),
       child: Text('نمایش تاریخچه'),
@@ -458,9 +471,9 @@ class _HiveDetailScreenState extends State<HiveDetailScreen> {
     );
   }
 
-  Widget buildDeleteButton(
-      BuildContext context, HiveDetailLogic model) {
-    return Container(width: 60,
+  Widget buildDeleteButton(BuildContext context, HiveDetailLogic model) {
+    return Container(
+      width: 60,
       child: MaterialButton(
         color: Theme.of(context).colorScheme.error,
         textColor: Theme.of(context).colorScheme.onError,
@@ -519,9 +532,9 @@ class _HiveDetailScreenState extends State<HiveDetailScreen> {
                       alignment: Alignment.bottomCenter,
                       child: Container(
                         height: 40,
-
                         margin: EdgeInsets.only(bottom: 30),
-                        child: Row(mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: [
                             MaterialButton(
                               onPressed: () => Navigator.of(context).pop(),

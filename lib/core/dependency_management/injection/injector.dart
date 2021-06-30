@@ -3,12 +3,8 @@ import 'package:lever/core/infrastructure/data/date_time_provider.dart';
 import 'package:lever/core/infrastructure/data/id_generator.dart';
 import 'package:lever/core/infrastructure/data/moor_db/app_database.dart';
 import 'package:lever/features/hive_management/data/hive_repo_impl.dart';
-import 'package:lever/features/hive_management/domain/usecases/add_hive_cmnd.dart';
-import 'package:lever/features/hive_management/domain/usecases/delete_hive_cmnd.dart';
-import 'package:lever/features/hive_management/domain/usecases/edit_hive_cmnd.dart';
-import 'package:lever/features/hive_management/domain/usecases/fetch_hive_cmnd.dart';
-import 'package:lever/features/hive_management/domain/usecases/fetch_hives_cmnd.dart';
-import 'package:lever/features/hive_management/domain/usecases/generate_hive_number_cmnd.dart';
+import 'package:lever/features/hive_management/domain/usecases/usecases.dart';
+
 import 'package:uuid/uuid.dart';
 
 class Injector {
@@ -35,4 +31,5 @@ class Injector {
   DeleteHiveCmnd get getDeleteHiveCmnd => DeleteHiveCmnd(this._hiveRepoImpl);
   EditHiveCmnd get getEditHiveCmnd => EditHiveCmnd(this._hiveRepoImpl);
   FetchHiveCmnd get getFetchHiveCmnd => FetchHiveCmnd(this._hiveRepoImpl);
+  FetchVisitsCmnd get getFetchVisitsCmnd => FetchVisitsCmnd(this._hiveRepoImpl);
 }

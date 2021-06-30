@@ -68,18 +68,21 @@ class _HomeHivesListItemState extends State<HomeHivesListItem> {
   Widget build(BuildContext context) {
     return Container(
       padding: EdgeInsets.all(8),
-      margin: EdgeInsets.only(bottom:10),
+      margin: EdgeInsets.only(bottom: 10),
       decoration: BoxDecoration(
         border: Border.all(
           color: Theme.of(context).colorScheme.onBackground,
           width: 1,
           style: BorderStyle.solid,
         ),
-        image:  (widget.hive.picture != null && widget.hive.picture.isNotEmpty)?DecorationImage(
-          image: FileImage(
-            File(widget.hive.picture),
-          ),fit: BoxFit.cover,
-        ):null,
+        image: (widget.hive.picture != null && widget.hive.picture.isNotEmpty)
+            ? DecorationImage(
+                image: FileImage(
+                  File(widget.hive.picture),
+                ),
+                fit: BoxFit.cover,
+              )
+            : null,
         borderRadius: BorderRadius.circular(33),
         color: Colors.transparent,
       ),
@@ -101,6 +104,9 @@ class _HomeHivesListItemState extends State<HomeHivesListItem> {
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
                         MaterialButton(
+                          color: Theme.of(context).colorScheme.background,
+                          textColor: Theme.of(context).colorScheme.onBackground,
+                          shape:StadiumBorder(),
                           onPressed: () {
                             setState(() {
                               _showContextMenu = false;
@@ -109,34 +115,11 @@ class _HomeHivesListItemState extends State<HomeHivesListItem> {
                           child: Icon(Icons.arrow_back_rounded),
                         ),
                         MaterialButton(
+                          color: Theme.of(context).colorScheme.background,
+                          textColor: Theme.of(context).colorScheme.onBackground,
+                          shape:StadiumBorder(),
                           onPressed: () {
-                            showDialog(
-                                context: context,
-                                builder: (context) {
-                                  return AlertDialog(
-                                    title: Text('حذف کندو'),
-                                    content: Text('آیا از حذف کندو مطمئنید؟'),
-                                    actions: [
-                                      CancelButton(
-                                        onPressed: () {
-                                          Navigator.of(context).pop();
-                                        },
-                                        child: Text('لغو'),
-                                      ),
-                                      PrimaryButton(
-                                        onPressed: () {
-                                          setState(() {
-                                            _isLoading = true;
-                                            widget.model.deleteHive(widget.hive.id);
-                                          });
-                                          Navigator.of(context).pop();
-                                        },
-                                        child: Text('حذف'),
-                                      ),
-                                    ],
-                                  );
-                                });
-
+                            showDeleteDialog(context);
                           },
                           child: Row(
                             children: [Icon(Icons.delete), Text('حذف')],
@@ -145,24 +128,80 @@ class _HomeHivesListItemState extends State<HomeHivesListItem> {
                       ],
                     )
                   : Center(
-                    child: Wrap(
+                      child: Wrap(
                         crossAxisAlignment: WrapCrossAlignment.center,
                         children: [
                           Column(
                             children: [
-                              Text('وضعیت: ' + widget.hive.populationInfo.status,),
-                              Text('آخرین بازدید: ' + _getLastVisitDate())
+                              Container(
+                                padding: EdgeInsets.all(8),
+                                decoration: BoxDecoration(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .background,
+                                    borderRadius:
+                                        BorderRadiusDirectional.circular(23)),
+                                child: Text(
+                                  'وضعیت: ' + widget.hive.populationInfo.status,
+                                ),
+                              ),
+                              Container(
+                                  padding: EdgeInsets.all(8),
+                                  decoration: BoxDecoration(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .background,
+                                      borderRadius:
+                                          BorderRadiusDirectional.circular(23)),
+                                  child: Text(
+                                      'آخرین بازدید: ' + _getLastVisitDate()))
                             ],
                           ),
-                          Text(
-                            widget.hive.number.toString(),
-                            style: Theme.of(context).textTheme.headline4,
+                          Container(
+                            padding: EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                                color: Theme.of(context).colorScheme.background,
+                                borderRadius:
+                                    BorderRadiusDirectional.circular(23)),
+                            child: Text(
+                              widget.hive.number.toString(),
+                              style: Theme.of(context).textTheme.headline4,
+                            ),
                           ),
                         ],
                       ),
-                  ),
+                    ),
             ),
     );
+  }
+
+  Future<dynamic> showDeleteDialog(BuildContext context) {
+    return showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Text('حذف کندو'),
+            content: Text('آیا از حذف کندو مطمئنید؟'),
+            actions: [
+              CancelButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: Text('لغو'),
+              ),
+              PrimaryButton(
+                onPressed: () {
+                  setState(() {
+                    _isLoading = true;
+                    widget.model.deleteHive(widget.hive.id);
+                  });
+                  Navigator.of(context).pop();
+                },
+                child: Text('حذف'),
+              ),
+            ],
+          );
+        });
   }
 
   String _getLastVisitDate() {
@@ -173,8 +212,6 @@ class _HomeHivesListItemState extends State<HomeHivesListItem> {
         '/' +
         date.day.toString();
   }
-
-
 }
 
 class HomeBottomNavigationBar extends StatelessWidget {

@@ -105,7 +105,10 @@ class HiveRepoImpl extends HiveRepo {
   fetchHive(String hiveId) async {
     return await _hiveFromHiveTable(await this._appDatabase.getHive(hiveId));
   }
-
+  @override
+  Future<List<Visit>> fetchVisits(String hiveId) async {
+    return await getHiveVisits(hiveId);
+  }
   Hive _generateCompleteHive(
       hiveId,
       Hive hive,
@@ -285,4 +288,6 @@ class HiveRepoImpl extends HiveRepo {
         await getHiveQueenInfo(hive.id),
         await getHiveVisits(hive.id));
   }
+
+
 }
