@@ -130,7 +130,10 @@ class _QueenSeenStatusState extends State<QueenSeenStatus> {
         DropdownButton(
             value: _dropdownValue,
             onChanged: (value) => _valueChanged(value),
-            items: <String>['ديده نشد', 'ديده شد', ]
+            items: <String>[
+              'ديده نشد',
+              'ديده شد',
+            ]
                 .map((e) => DropdownMenuItem<String>(value: e, child: Text(e)))
                 .toList())
       ],
@@ -139,7 +142,7 @@ class _QueenSeenStatusState extends State<QueenSeenStatus> {
 
   void _valueChanged(dynamic value) {
     setState(() {
-      widget.setData('queenSeen', value=='ديده شد'?true:false);
+      widget.setData('queenSeen', value == 'ديده شد' ? true : false);
       _dropdownValue = value;
     });
   }
@@ -158,24 +161,24 @@ class QueenCells extends StatefulWidget {
 }
 
 class _QueenCellsState extends State<QueenCells> {
-  TextEditingController annualHoneyController;
+  TextEditingController queenCellController;
   String lastValidValue = '';
 
   @override
   void initState() {
-    annualHoneyController = TextEditingController();
-    annualHoneyController.text='0';
-    annualHoneyController.addListener(() {
-      if (annualHoneyController.text.isEmpty) return;
-      if (validateField(annualHoneyController.text)) {
-        widget.setData('queenCells', int.parse(annualHoneyController.text));
+    queenCellController = TextEditingController();
+    queenCellController.text = '0';
+    queenCellController.addListener(() {
+      if (queenCellController.text.isEmpty) return;
+      if (validateField(queenCellController.text)) {
+        widget.setData('queenCells', int.parse(queenCellController.text));
 
         setState(() {
-          lastValidValue = annualHoneyController.text;
+          lastValidValue = queenCellController.text;
         });
       } else {
         setState(() {
-          annualHoneyController.text = lastValidValue;
+          queenCellController.text = lastValidValue;
         });
       }
     });
@@ -191,7 +194,7 @@ class _QueenCellsState extends State<QueenCells> {
         CustomTextField(
           widthInPercent: 0.4,
           hintText: 'تعداد',
-          controller: annualHoneyController,
+          controller: queenCellController,
           inputType: TextInputType.number,
         ),
       ],
@@ -271,7 +274,10 @@ class _BehaviorStatusState extends State<BehaviorStatus> {
         DropdownButton(
             value: _dropdownValue,
             onChanged: (value) => _valueChanged(value),
-            items: <String>['آرام', 'عصبانی', ]
+            items: <String>[
+              'آرام',
+              'عصبانی',
+            ]
                 .map((e) => DropdownMenuItem<String>(value: e, child: Text(e)))
                 .toList())
       ],
@@ -283,5 +289,122 @@ class _BehaviorStatusState extends State<BehaviorStatus> {
       widget.setData('behavior', value);
       _dropdownValue = value;
     });
+  }
+}
+
+class DropdownStatusInput extends StatefulWidget {
+  final Function setData;
+  final List<String> items;
+  final String dataFieldName;
+  final String title;
+
+  const DropdownStatusInput({
+    Key key,
+    @required this.setData,
+    @required this.items,
+    @required this.dataFieldName,
+    @required this.title,
+  }) : super(key: key);
+
+  @override
+  _DropdownStatusInputState createState() => _DropdownStatusInputState();
+}
+
+class _DropdownStatusInputState extends State<DropdownStatusInput> {
+  String _dropdownValue;
+
+  @override
+  void initState() {
+    _dropdownValue = widget.items.first;
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.end,
+      children: [
+        InputTitle(text: widget.title),
+        DropdownButton(
+            value: _dropdownValue,
+            onChanged: (value) => _valueChanged(value),
+            items: widget.items
+                .map((e) => DropdownMenuItem<String>(value: e, child: Text(e)))
+                .toList())
+      ],
+    );
+  }
+
+  void _valueChanged(dynamic value) {
+    setState(() {
+      widget.setData(widget.dataFieldName, value);
+      _dropdownValue = value;
+    });
+  }
+}
+
+class NumericInput extends StatefulWidget {
+  final Function setData;
+  final String title;
+  final String hint;
+  final String dataFieldName;
+
+  const NumericInput({
+    Key key,
+    @required this.setData,
+    @required this.title,
+    @required this.hint,
+    @required this.dataFieldName,
+  }) : super(key: key);
+
+  @override
+  _NumericInputState createState() => _NumericInputState();
+}
+
+class _NumericInputState extends State<NumericInput> {
+  TextEditingController inputController;
+  String lastInput = '';
+
+  @override
+  void initState() {
+    inputController = TextEditingController();
+    inputController.addListener(() {
+      if (inputController.text.isEmpty) return;
+      if (validateField(inputController.text)) {
+        widget.setData(widget.dataFieldName, int.parse(inputController.text));
+        setState(() {
+          lastInput = inputController.text;
+        });
+      } else
+        setState(() {
+          inputController.text = lastInput;
+        });
+    });
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.end,
+      children: [
+        InputTitle(text: widget.title),
+        CustomTextField(
+          widthInPercent: 0.4,
+          hintText: widget.hint,
+          controller: inputController,
+          inputType: TextInputType.number,
+        ),
+      ],
+    );
+  }
+
+  bool validateField(String value) {
+    try {
+      int.parse(value);
+      return true;
+    } catch (e) {
+      return false;
+    }
   }
 }

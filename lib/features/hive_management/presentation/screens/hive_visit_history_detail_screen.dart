@@ -311,6 +311,7 @@ class VisitDetailInfoBox extends StatelessWidget {
 }
 
 String _getPersianDate(DateTime dt) {
+  if(dt==DateTime(0))return 'وارد نشده';
   Jalali date = Jalali.fromDateTime(dt);
   return date.year.toString() +
       '/' +

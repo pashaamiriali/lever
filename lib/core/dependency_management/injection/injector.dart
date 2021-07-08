@@ -45,4 +45,10 @@ class Injector {
 
   RegularHiveVisitCmnd get getRegularHiveVisitCmnd =>
       RegularHiveVisitCmnd(this._visitRepoImpl);
+
+  HarvestHiveHoneyCmnd get getHarvestHiveHoneyCmnd =>
+      HarvestHiveHoneyCmnd(this._visitRepoImpl);
+
+  ChangeHiveQueenCmnd get getChangeHiveQueenCmnd =>
+      ChangeHiveQueenCmnd(this._visitRepoImpl);
 }

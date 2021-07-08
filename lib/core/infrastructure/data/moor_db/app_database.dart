@@ -115,6 +115,9 @@ class AppDatabase extends _$AppDatabase {
   Future<int> addChangeQueen(TChangeQueensCompanion changeQueen) {
     return into(tChangeQueens).insert(changeQueen);
   }
+  Future<int> addHarvestHoney(THarvestHoneysCompanion harvestHoney) {
+    return into(tHarvestHoneys).insert(harvestHoney);
+  }
 
   Future<int> addPopulationInfo(TPopulationInfosCompanion populationInfo) {
     return into(tPopulationInfos).insert(populationInfo);

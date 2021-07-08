@@ -23,6 +23,25 @@ class VisitRepoImpl implements VisitRepo {
         populationInfoId, regularVisitId, regularVisit.populationInfo));
   }
 
+  @override
+  saveHarvestHoney(HarvestHoney harvestHoney) async {
+    var harvestHoneyId = _idGen.generateId();
+    await this
+        ._appDatabase
+        .addHarvestHoney(_tableFromHarvestHoney(harvestHoney, harvestHoneyId));
+  }
+
+  @override
+  saveChangeQueen(ChangeQueen changeQueen) async {
+    var changeQueenId = this._idGen.generateId();
+    var queenInfoId = this._idGen.generateId();
+    await this
+        ._appDatabase
+        .addChangeQueen(_tableFromChangeQueen(changeQueen, changeQueenId));
+    await this._appDatabase.addQueenInfo(
+        _tableFromQueenInfo(changeQueen.queenInfo, queenInfoId, changeQueenId));
+  }
+
   TPopulationInfosCompanion _tableFromPopulationInfo(String populationInfoId,
       String regularVisitId, PopulationInfo populationInfo) {
     return TPopulationInfosCompanion(
@@ -45,6 +64,43 @@ class VisitRepoImpl implements VisitRepo {
       honeyMaking: Value(regularVisit.honeyMaking),
       pictures: Value(json.encode(regularVisit.pictures)),
       queenSeen: Value(regularVisit.queenSeen),
+    );
+  }
+
+  THarvestHoneysCompanion _tableFromHarvestHoney(
+      HarvestHoney harvestHoney, String harvestHoneyId) {
+    return THarvestHoneysCompanion(
+      id: Value(harvestHoneyId),
+      date: Value(harvestHoney.date),
+      frames: Value(harvestHoney.frames),
+      description: Value(harvestHoney.description),
+      hiveId: Value(harvestHoney.hiveId),
+      describedAmount: Value(harvestHoney.describedAmount),
+      pictures: Value(json.encode(harvestHoney.pictures)),
+      quality: Value(harvestHoney.quality),
+      weight: Value(harvestHoney.weight),
+    );
+  }
+
+  TChangeQueensCompanion _tableFromChangeQueen(
+      ChangeQueen changeQueen, String changeQueenId) {
+    return TChangeQueensCompanion(
+      id: Value(changeQueenId),
+      hiveId: Value(changeQueen.hiveId),
+      date: Value(changeQueen.date),
+      description: Value(changeQueen.description),
+      pictures: Value(json.encode(changeQueen.pictures)),
+    );
+  }
+
+  TQueenInfosCompanion _tableFromQueenInfo(
+      QueenInfo queenInfo, String queenInfoId, changeQueenId) {
+    return TQueenInfosCompanion(
+      id: Value(queenInfoId),
+      changeQueenId: Value(changeQueenId),
+      backColor: Value(queenInfo.backColor),
+      breed: Value(queenInfo.breed),
+      enterDate: Value(queenInfo.enterDate),
     );
   }
 }

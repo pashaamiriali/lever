@@ -20,7 +20,7 @@ class VisitScreen extends StatefulWidget {
 
 class _VisitScreenState extends State<VisitScreen> {
   VisitMode visitMode = VisitMode.regularVisit;
-  List<String> pictures=[];
+  List<String> pictures = [];
   Map<String, dynamic> regularVisitData;
 
   Map<String, dynamic> changeQueenData;
@@ -69,7 +69,11 @@ class _VisitScreenState extends State<VisitScreen> {
         Provider.of<AppLogic>(context, listen: false).selectedHiveId;
     return WillPopScope(
       child: ChangeNotifierProvider<VisitHiveLogic>(create: (context) {
-        return VisitHiveLogic(_injector.getRegularHiveVisitCmnd);
+        return VisitHiveLogic(
+          _injector.getRegularHiveVisitCmnd,
+          _injector.getHarvestHiveHoneyCmnd,
+          _injector.getChangeHiveQueenCmnd,
+        );
       }, builder: (context, _) {
         return Consumer<VisitHiveLogic>(builder: (context, model, _) {
           return Scaffold(
@@ -93,15 +97,17 @@ class _VisitScreenState extends State<VisitScreen> {
                           case VisitMode.regularVisit:
                             regularVisitData['hiveId'] = hiveId;
                             model.saveRegularVisit(regularVisitData);
-                            Navigator.of(context).pushReplacementNamed('/');
                             break;
                           case VisitMode.changeQueen:
-                            // TODO: Handle this case.
+                            changeQueenData['hiveId'] = hiveId;
+                            model.saveChangeQueen(changeQueenData);
                             break;
                           case VisitMode.harvestHoney:
-                            // TODO: Handle this case.
+                            harvestHoneyData['hiveId'] = hiveId;
+                            model.saveHarvestHoney(harvestHoneyData);
                             break;
                         }
+                        Navigator.of(context).pushReplacementNamed('/');
                       })
                 ],
               ),
@@ -133,6 +139,29 @@ class _VisitScreenState extends State<VisitScreen> {
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
         buildDefaultVisitInputs(context),
+        DropdownStatusInput(
+            setData: setHarvestHoneyData,
+            items: ['کم', 'متوسط', 'زیاد'],
+            dataFieldName: 'describedAmount',
+            title: 'مقدار توصیفی'),
+        NumericInput(
+            setData: setHarvestHoneyData,
+            title: 'تعداد قاب',
+            hint: 'عدد',
+            dataFieldName: 'frames'),
+        NumericInput(
+            setData: setHarvestHoneyData,
+            title: 'وزن به کیلو',
+            hint: 'به کیلو',
+            dataFieldName: 'weight'),
+        DropdownStatusInput(
+            setData: setHarvestHoneyData,
+            items: ['پایین', 'متوسط', 'بالا'],
+            dataFieldName: 'quality',
+            title: 'کیفیت عسل'),
+        NotesSection(
+          setData: setHarvestHoneyData,
+        ),
       ],
     );
   }
@@ -142,6 +171,16 @@ class _VisitScreenState extends State<VisitScreen> {
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
         buildDefaultVisitInputs(context),
+        QueenEnterDateSection(setData: setChangeQueenData),
+        BreedSection(setData: setChangeQueenData),
+        QueenBackColorSection(
+          setData: (key, value) {
+            setState(() {
+              changeQueenData['backColor'] = value;
+            });
+          },
+        ),
+        NotesSection(setData: setChangeQueenData),
       ],
     );
   }
@@ -272,6 +311,18 @@ class _VisitScreenState extends State<VisitScreen> {
   void setRegularVisitData(String key, value) {
     setState(() {
       regularVisitData[key] = value;
+    });
+  }
+
+  void setHarvestHoneyData(String key, value) {
+    setState(() {
+      harvestHoneyData[key] = value;
+    });
+  }
+
+  void setChangeQueenData(String key, value) {
+    setState(() {
+      changeQueenData[key] = value;
     });
   }
 

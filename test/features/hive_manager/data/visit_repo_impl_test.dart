@@ -35,4 +35,36 @@ void main() {
           TypeMatcher<TPopulationInfosCompanion>());
     });
   });
+  group('saveHarvestHoney', () {
+    MockAppDatabase appDatabase = MockAppDatabase();
+    MockIDGen idGen = MockIDGen();
+    VisitRepoImpl impl = VisitRepoImpl(appDatabase, idGen);
+    var visit = HarvestHoney(null, 'someId2134', DateTime.now(),
+        ['something.jpg'], 'some desc', 'Good', 5, 20, 'Good');
+    test('should call the addHarvestHoney with proper arguments', () async {
+      await impl.saveHarvestHoney(visit);
+      expect(verify(appDatabase.addHarvestHoney(captureAny)).captured[0],
+          TypeMatcher<THarvestHoneysCompanion>());
+    });
+  });
+  group('saveChangeQueen', () {
+    MockAppDatabase appDatabase = MockAppDatabase();
+    MockIDGen idGen = MockIDGen();
+    VisitRepoImpl impl = VisitRepoImpl(appDatabase, idGen);
+    ChangeQueen visit = ChangeQueen(
+        null,
+        'someId1234',
+        DateTime.now(),
+        ['something.jpg'],
+        'some desc',
+        QueenInfo(null, null, DateTime.now(), 'Some breed', '4000'));
+    test('should call addChangeQueen and addQueenInfo with proper arguments',
+        () async {
+      await impl.saveChangeQueen(visit);
+      expect(verify(appDatabase.addChangeQueen(captureAny)).captured[0],
+          TypeMatcher<TChangeQueensCompanion>());
+      expect(verify(appDatabase.addQueenInfo(captureAny)).captured[0],
+          TypeMatcher<TQueenInfosCompanion>());
+    });
+  });
 }
