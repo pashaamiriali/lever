@@ -220,9 +220,9 @@ class HiveRepoImpl extends HiveRepo {
 
   Future<List<Visit>> getHiveVisits(String hiveId) async {
     List<Visit> visits = [];
-    var _rawRegularVisits = await this._appDatabase.allRegularVisits;
-    var _rawChangeQueens = await this._appDatabase.allChangeQueens;
-    var _rawHarvestHoneys = await this._appDatabase.allHarvestHoneys;
+    var _rawRegularVisits = await this._appDatabase.getHiveRegularVisits(hiveId);
+    var _rawChangeQueens = await this._appDatabase.getHiveChangeQueens(hiveId);
+    var _rawHarvestHoneys = await this._appDatabase.getHiveHarvestHoneys(hiveId);
     for (TRegularVisit regularVisit in _rawRegularVisits)
       visits.add(RegularVisit(
           regularVisit.id,

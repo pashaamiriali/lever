@@ -10,6 +10,7 @@ import 'package:shamsi_date/extensions.dart';
 
 class NotesSection extends StatefulWidget {
   final Function setData;
+
   const NotesSection({
     Key key,
     @required this.setData,
@@ -21,6 +22,7 @@ class NotesSection extends StatefulWidget {
 
 class _NotesSectionState extends State<NotesSection> {
   TextEditingController notesController;
+
   @override
   void initState() {
     super.initState();
@@ -70,6 +72,7 @@ class NotesInput extends StatelessWidget {
 
 class AnnualHoneySection extends StatefulWidget {
   final Function setData;
+
   const AnnualHoneySection({
     Key key,
     @required this.setData,
@@ -82,6 +85,7 @@ class AnnualHoneySection extends StatefulWidget {
 class _AnnualHoneySectionState extends State<AnnualHoneySection> {
   TextEditingController annualHoneyController;
   String lastValidValue = '';
+
   @override
   void initState() {
     annualHoneyController = TextEditingController();
@@ -144,6 +148,7 @@ class AnnualHoneyInput extends StatelessWidget {
 
 class StatusSection extends StatefulWidget {
   final Function setData;
+
   const StatusSection({
     Key key,
     @required this.setData,
@@ -155,6 +160,7 @@ class StatusSection extends StatefulWidget {
 
 class _StatusSectionState extends State<StatusSection> {
   String _dropdownValue = 'متوسط';
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -181,6 +187,7 @@ class _StatusSectionState extends State<StatusSection> {
 
 class FrameStairsSection extends StatefulWidget {
   final Function setData;
+
   const FrameStairsSection({
     Key key,
     @required this.setData,
@@ -195,6 +202,7 @@ class _FrameStairsSectionState extends State<FrameStairsSection> {
   TextEditingController stairsController;
   String lastFramesData = '';
   String lastStairsData = '';
+
   @override
   void initState() {
     framesController = TextEditingController();
@@ -280,6 +288,7 @@ class QueenBackColorSection extends StatefulWidget {
 
 class _QueenBackColorSectionState extends State<QueenBackColorSection> {
   int _dropdownValue = 0XFFFF0000;
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -343,6 +352,7 @@ String getColorNameFromCode(int colorCode) {
 
 class QueenEnterDateSection extends StatefulWidget {
   final Function setData;
+
   const QueenEnterDateSection({
     Key key,
     @required this.setData,
@@ -356,6 +366,7 @@ class _QueenEnterDateSectionState extends State<QueenEnterDateSection> {
   TextEditingController _dayController, _monthController, _yearController;
   Jalali _queenAddedDate = Jalali.now();
   String _lastDayValue, _lastMonthValue, _lastYearValue;
+
   @override
   void initState() {
     super.initState();
@@ -516,6 +527,7 @@ class DateInput extends StatelessWidget {
 
 class BreedSection extends StatefulWidget {
   final Function setData;
+
   const BreedSection({Key key, @required this.setData}) : super(key: key);
 
   @override
@@ -524,6 +536,7 @@ class BreedSection extends StatefulWidget {
 
 class _BreedSectionState extends State<BreedSection> {
   TextEditingController _controller;
+
   @override
   void initState() {
     _controller = TextEditingController();
@@ -555,6 +568,7 @@ class _BreedSectionState extends State<BreedSection> {
 
 class HiveNumberSection extends StatefulWidget {
   final AddHiveViewLogic model;
+
   const HiveNumberSection({
     Key key,
     this.model,
@@ -566,6 +580,7 @@ class HiveNumberSection extends StatefulWidget {
 
 class _HiveNumberSectionState extends State<HiveNumberSection> {
   Future _generateNumberFuture;
+
   @override
   void initState() {
     _generateNumberFuture = widget.model.generateHiveNumber();
@@ -607,6 +622,7 @@ class _HiveNumberSectionState extends State<HiveNumberSection> {
 
 class TakeImageSection extends StatefulWidget {
   final Function setData;
+
   const TakeImageSection({
     Key key,
     @required this.setData,
@@ -618,6 +634,7 @@ class TakeImageSection extends StatefulWidget {
 
 class _TakeImageSectionState extends State<TakeImageSection> {
   File _picture;
+
   @override
   Widget build(BuildContext context) {
     Injector _injector = InjectorProvider.of(context).injector;
@@ -641,7 +658,7 @@ class _TakeImageSectionState extends State<TakeImageSection> {
             child: _picture == null ? Text('خالی') : Container(),
           ),
         ),
-        MaterialButton(
+        PrimaryButton(
           onPressed: () {
             Navigator.of(context).push(MaterialPageRoute(
                 builder: (context) => TakePictureScreen(
@@ -651,9 +668,6 @@ class _TakeImageSectionState extends State<TakeImageSection> {
                     )));
           },
           child: Text('گرفتن عکس'),
-          elevation: 0,
-          focusElevation: 0,
-          shape: StadiumBorder(),
         ),
       ],
     );

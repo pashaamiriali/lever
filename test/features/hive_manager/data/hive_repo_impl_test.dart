@@ -124,11 +124,11 @@ main() {
         .thenAnswer((realInvocation) async => examplePopulationInfoRecord);
     when(mockAppDatabase.getLastQueenInfo(any))
         .thenAnswer((realInvocation) async => exampleQueenInfoRecord);
-    when(mockAppDatabase.allChangeQueens)
+    when(mockAppDatabase.getHiveChangeQueens(any))
         .thenAnswer((realInvocation) async => [exampleChangeQueenRecord]);
-    when(mockAppDatabase.allRegularVisits)
+    when(mockAppDatabase.getHiveRegularVisits(any))
         .thenAnswer((realInvocation) async => [exampleRegularVisitRecord]);
-    when(mockAppDatabase.allHarvestHoneys)
+    when(mockAppDatabase.getHiveHarvestHoneys(any))
         .thenAnswer((realInvocation) async => [exampleHarvestHoneyRecord]);
     when(mockAppDatabase.getPopulationInfo(any))
         .thenAnswer((realInvocation) async => examplePopulationInfoRecord);
@@ -250,11 +250,11 @@ main() {
         .thenAnswer((realInvocation) async => examplePopulationInfoRecord);
     when(mockAppDatabase.getLastQueenInfo(any))
         .thenAnswer((realInvocation) async => exampleQueenInfoRecord);
-    when(mockAppDatabase.allChangeQueens)
+    when(mockAppDatabase.getHiveChangeQueens(any))
         .thenAnswer((realInvocation) async => [exampleChangeQueenRecord]);
-    when(mockAppDatabase.allRegularVisits)
+    when(mockAppDatabase.getHiveRegularVisits(any))
         .thenAnswer((realInvocation) async => [exampleRegularVisitRecord]);
-    when(mockAppDatabase.allHarvestHoneys)
+    when(mockAppDatabase.getHiveHarvestHoneys(any))
         .thenAnswer((realInvocation) async => [exampleHarvestHoneyRecord]);
     when(mockAppDatabase.getPopulationInfo(any))
         .thenAnswer((realInvocation) async => examplePopulationInfoRecord);
@@ -376,11 +376,11 @@ main() {
         .thenAnswer((realInvocation) async => examplePopulationInfoRecord);
     when(mockAppDatabase.getLastQueenInfo(any))
         .thenAnswer((realInvocation) async => exampleQueenInfoRecord);
-    when(mockAppDatabase.allChangeQueens)
+    when(mockAppDatabase.getHiveChangeQueens(any))
         .thenAnswer((realInvocation) async => [exampleChangeQueenRecord]);
-    when(mockAppDatabase.allRegularVisits)
+    when(mockAppDatabase.getHiveRegularVisits(any))
         .thenAnswer((realInvocation) async => [exampleRegularVisitRecord]);
-    when(mockAppDatabase.allHarvestHoneys)
+    when(mockAppDatabase.getHiveHarvestHoneys(any))
         .thenAnswer((realInvocation) async => [exampleHarvestHoneyRecord]);
     when(mockAppDatabase.getPopulationInfo(any))
         .thenAnswer((realInvocation) async => examplePopulationInfoRecord);

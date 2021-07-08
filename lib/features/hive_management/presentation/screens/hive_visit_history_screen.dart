@@ -9,7 +9,7 @@ import 'package:provider/provider.dart';
 import 'package:shamsi_date/shamsi_date.dart';
 
 import 'hive_visit_history_detail_screen.dart';
-
+//todo: loads visits from other hives
 class HiveVisitHistoryScreen extends StatelessWidget {
   const HiveVisitHistoryScreen({Key key}) : super(key: key);
 
@@ -191,7 +191,7 @@ class HiveVisitHistoryScreen extends StatelessWidget {
                 Navigator.of(context).pop();
               },
               rightAction: () {
-                //TODO: open visits screen
+               Navigator.of(context).pushReplacementNamed('visit');
               },
               rightActionChild: Icon(Icons.visibility_rounded),
             ),

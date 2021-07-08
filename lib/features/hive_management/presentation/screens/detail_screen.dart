@@ -29,9 +29,10 @@ class _HiveDetailScreenState extends State<HiveDetailScreen> {
     Injector injector = InjectorProvider.of(context).injector;
     return ChangeNotifierProvider<HiveDetailLogic>(
         create: (context) => HiveDetailLogic(
-            injector.getEditHiveCmnd,
-            injector.getFetchHiveCmnd,
-            injector.getDeleteHiveCmnd,),
+              injector.getEditHiveCmnd,
+              injector.getFetchHiveCmnd,
+              injector.getDeleteHiveCmnd,
+            ),
         builder: (context, _) {
           return Consumer<HiveDetailLogic>(builder: (context, model, _) {
             return FutureBuilder<Hive>(
@@ -58,7 +59,8 @@ class _HiveDetailScreenState extends State<HiveDetailScreen> {
                                 Navigator.of(context).pushReplacementNamed('/'),
                             rightActionChild: Icon(Icons.remove_red_eye),
                             rightAction: () {
-                              //TODO: show visit screen
+                              Navigator.of(context)
+                                  .pushReplacementNamed('visit');
                             },
                           ),
                         ],

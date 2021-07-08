@@ -31,43 +31,59 @@ LazyDatabase _openConnection() {
 ])
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
+
   @override
   int get schemaVersion => 1;
 
   Future<List<THive>> get allHives => select(tHives).get();
-  Future<List<TRegularVisit>> get allRegularVisits =>
-      select(tRegularVisits).get();
-  Future<List<TChangeQueen>> get allChangeQueens => select(tChangeQueens).get();
-  Future<List<THarvestHoney>> get allHarvestHoneys =>
-      select(tHarvestHoneys).get();
+
+  //TODO: this should not provide for the history list
+  Future<List<TRegularVisit>> getHiveRegularVisits(hiveId) async {
+    return await (select(tRegularVisits)
+          ..where((tbl) => tbl.hiveId.equals(hiveId)))
+        .get();
+  }
+
+  Future<List<TChangeQueen>> getHiveChangeQueens(hiveId) async {
+    return await (select(tChangeQueens)
+          ..where((tbl) => tbl.hiveId.equals(hiveId)))
+        .get();
+  }
+
+  Future<List<THarvestHoney>> getHiveHarvestHoneys(hiveId) async {
+    return await (select(tHarvestHoneys)
+          ..where((tbl) => tbl.hiveId.equals(hiveId)))
+        .get();
+  }
 
   Future<TPopulationInfo> getLastPopulationInfo(String hiveId) async {
-    var regularVisit = await (select(tRegularVisits)
+    var regularVisits = await (select(tRegularVisits)
           ..where((tbl) => tbl.hiveId.equals(hiveId))
           ..orderBy(
             [(t) => OrderingTerm(expression: t.date, mode: OrderingMode.desc)],
           ))
-        .getSingle();
-    return (select(tPopulationInfos)
-          ..where((tbl) => tbl.regularVisitId.equals(regularVisit.id)))
+        .get();
+
+    return await (select(tPopulationInfos)
+          ..where((tbl) => tbl.regularVisitId.equals(regularVisits.first.id)))
         .getSingle();
   }
 
   Future<TPopulationInfo> getPopulationInfo(String regularVisitId) async {
-    return (select(tPopulationInfos)
+    return await (select(tPopulationInfos)
           ..where((tbl) => tbl.regularVisitId.equals(regularVisitId)))
         .getSingle();
   }
 
   Future<TQueenInfo> getLastQueenInfo(String hiveId) async {
-    var changeQueen = await (select(tChangeQueens)
+    var changeQueens = await (select(tChangeQueens)
           ..where((tbl) => tbl.hiveId.equals(hiveId))
           ..orderBy(
             [(t) => OrderingTerm(expression: t.date, mode: OrderingMode.desc)],
           ))
-        .getSingle();
-    return (select(tQueenInfos)
-          ..where((tbl) => tbl.changeQueenId.equals(changeQueen.id)))
+        .get();
+    return await (select(tQueenInfos)
+          ..where((tbl) => tbl.changeQueenId.equals(changeQueens.first.id)))
         .getSingle();
   }
 
@@ -115,15 +131,17 @@ class AppDatabase extends _$AppDatabase {
   Future<void> updateHive(THive hive) async {
     await update(tHives).replace(hive);
   }
+
   Future<void> updatePopulationInfo(TPopulationInfo populationInfo) async {
     await update(tPopulationInfos).replace(populationInfo);
   }
+
   Future<void> updateQueenInfo(TQueenInfo queenInfo) async {
     await update(tQueenInfos).replace(queenInfo);
   }
-  Future<THive> getHive(String hiveId)async{
-    return await  (select(tHives)
-          ..where((tbl) => tbl.id.equals(hiveId)))
+
+  Future<THive> getHive(String hiveId) async {
+    return await (select(tHives)..where((tbl) => tbl.id.equals(hiveId)))
         .getSingle();
   }
 }

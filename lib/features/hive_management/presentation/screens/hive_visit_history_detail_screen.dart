@@ -169,13 +169,30 @@ class VisitDetailScreen extends StatelessWidget {
             children: [
               Align(
                 alignment: Alignment.center,
-                child: Row(mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    InputTitle(
-                      text: _getPersianDate(visit.date),
-                    ),SizedBox(width: 10),
-                    Text(visitMode)
-                  ],
+                child: Container(
+                  width: MediaQuery.of(context).size.width * 0.5,
+                  padding: EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.background,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Theme.of(context)
+                              .colorScheme
+                              .onBackground
+                              .withOpacity(0.7),
+                        )
+                      ],
+                      borderRadius: BorderRadius.circular(500)),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      InputTitle(
+                        text: _getPersianDate(visit.date),
+                      ),
+                      SizedBox(width: 10),
+                      Text(visitMode)
+                    ],
+                  ),
                 ),
               ),
               buildShowImagesSection(context, visit),
@@ -193,12 +210,12 @@ class VisitDetailScreen extends StatelessWidget {
         Navigator.of(context).push(
           MaterialPageRoute(
             builder: (_context) =>
-                ShowVisitPicturesScreen(pictures: visit.pictures),
+                ShowVisitPicturesScreen(imagePaths: visit.pictures),
           ),
         );
       },
       shape: StadiumBorder(),
-      child: Text('نمایش تاریخچه'),
+      child: Text('نمایش عکس ها'),
     );
   }
 
@@ -212,13 +229,13 @@ class VisitDetailScreen extends StatelessWidget {
                 children: [
                   Container(
                     decoration: BoxDecoration(
-                      image: (visit.pictures.isEmpty ||
-                              visit.pictures[0].isNotEmpty)
-                          ? null
-                          : DecorationImage(
-                              image: FileImage(File(visit.pictures[0])),
-                              fit: BoxFit.cover,
-                            ),
+                      image:
+                          (visit.pictures.isEmpty || visit.pictures[0].isEmpty)
+                              ? null
+                              : DecorationImage(
+                                  image: FileImage(File(visit.pictures[0])),
+                                  fit: BoxFit.cover,
+                                ),
                     ),
                   ),
                   Padding(
@@ -244,6 +261,16 @@ class VisitDetailScreen extends StatelessWidget {
               );
             });
       },
+      child: Container(
+        decoration: BoxDecoration(
+          image: (visit.pictures.isEmpty || visit.pictures[0].isEmpty)
+              ? null
+              : DecorationImage(
+                  image: FileImage(File(visit.pictures[0])),
+                  fit: BoxFit.cover,
+                ),
+        ),
+      ),
     );
   }
 }
@@ -292,14 +319,95 @@ String _getPersianDate(DateTime dt) {
       date.day.toString();
 }
 
-class ShowVisitPicturesScreen extends StatelessWidget {
-  const ShowVisitPicturesScreen({Key key, this.pictures}) : super(key: key);
-  final List<String> pictures;
+class ShowVisitPicturesScreen extends StatefulWidget {
+  const ShowVisitPicturesScreen({Key key, this.imagePaths}) : super(key: key);
+  final List<String> imagePaths;
+
+  @override
+  _ShowVisitPicturesScreenState createState() =>
+      _ShowVisitPicturesScreenState();
+}
+
+class _ShowVisitPicturesScreenState extends State<ShowVisitPicturesScreen> {
+  String currentImagePath;
+
+  @override
+  void initState() {
+    currentImagePath = widget.imagePaths[0];
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
 //TODO: sliding tabs
-    return Container();
+    return Scaffold(
+      body: SafeArea(
+        child: Stack(
+          children: [
+            Container(
+              width: MediaQuery.of(context).size.width,
+              child: Image.file(
+                File(currentImagePath),
+                fit: BoxFit.contain,
+              ),
+            ),
+            Align(
+              alignment: Alignment.topCenter,
+              child: Container(
+                width: double.infinity,
+                height: 80,
+                padding: EdgeInsets.all(10),
+                child: ListView.builder(
+                  padding: EdgeInsets.all(8),
+                  scrollDirection: Axis.horizontal,
+                  itemCount: widget.imagePaths.length,
+                  itemBuilder: (BuildContext context, int index) {
+                    return InkWell(
+                      onTap: () {
+                        setState(() {
+                          currentImagePath = widget.imagePaths[index];
+                        });
+                      },
+                      child: Container(
+                        margin: EdgeInsets.only(right: 10),
+                        width: 50,
+                        height: 50,
+                        decoration: BoxDecoration(
+                          image: DecorationImage(
+                            image: FileImage(
+                              File(widget.imagePaths[index]),
+                            ),
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(30.0),
+              child: Align(
+                alignment: Alignment.bottomCenter,
+                child: Container(
+                  height: 40,
+                  margin: EdgeInsets.only(bottom: 30),
+                  child: MaterialButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    color: Theme.of(context).colorScheme.surface,
+                    elevation: 10,
+                    shape: StadiumBorder(),
+                    child: Center(
+                      child: Icon(Icons.close),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }
-

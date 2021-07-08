@@ -4,6 +4,7 @@ import 'package:lever/core/dependency_management/injection/injector.dart';
 import 'package:lever/features/app/presentation/logic/app_view_logic.dart';
 import 'package:lever/features/hive_management/presentation/screens/detail_screen.dart';
 import 'package:lever/features/hive_management/presentation/screens/hive_add_screen.dart';
+import 'package:lever/features/hive_management/presentation/screens/visit_screen.dart';
 import 'package:lever/features/home_screen/home_screen.dart';
 import 'package:provider/provider.dart';
 
@@ -54,6 +55,7 @@ class MyApp extends StatelessWidget {
                 '/': (BuildContext context) => HomeScreen(),
                 'addHive': (BuildContext context) => AddHiveView(),
                 'hiveDetails': (BuildContext context) => HiveDetailScreen(),
+                'visit': (BuildContext context) => VisitScreen(),
               },
             );
           }),

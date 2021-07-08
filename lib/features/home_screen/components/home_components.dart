@@ -124,6 +124,17 @@ class _HomeHivesListItemState extends State<HomeHivesListItem> {
                           child: Row(
                             children: [Icon(Icons.delete), Text('حذف')],
                           ),
+                        ),MaterialButton(
+                          color: Theme.of(context).colorScheme.background,
+                          textColor: Theme.of(context).colorScheme.onBackground,
+                          shape:StadiumBorder(),
+                          onPressed: () {
+                            Provider.of<AppLogic>(context,listen:false).selectedHiveId=widget.hive.id;
+                            Navigator.of(context).pushReplacementNamed('visit');
+                          },
+                          child: Row(
+                            children: [Icon(Icons.visibility_rounded), Text('بازدید')],
+                          ),
                         )
                       ],
                     )
