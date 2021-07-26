@@ -106,7 +106,7 @@ class _HomeHivesListItemState extends State<HomeHivesListItem> {
                         MaterialButton(
                           color: Theme.of(context).colorScheme.background,
                           textColor: Theme.of(context).colorScheme.onBackground,
-                          shape:StadiumBorder(),
+                          shape: StadiumBorder(),
                           onPressed: () {
                             setState(() {
                               _showContextMenu = false;
@@ -117,23 +117,28 @@ class _HomeHivesListItemState extends State<HomeHivesListItem> {
                         MaterialButton(
                           color: Theme.of(context).colorScheme.background,
                           textColor: Theme.of(context).colorScheme.onBackground,
-                          shape:StadiumBorder(),
+                          shape: StadiumBorder(),
                           onPressed: () {
                             showDeleteDialog(context);
                           },
                           child: Row(
                             children: [Icon(Icons.delete), Text('حذف')],
                           ),
-                        ),MaterialButton(
+                        ),
+                        MaterialButton(
                           color: Theme.of(context).colorScheme.background,
                           textColor: Theme.of(context).colorScheme.onBackground,
-                          shape:StadiumBorder(),
+                          shape: StadiumBorder(),
                           onPressed: () {
-                            Provider.of<AppLogic>(context,listen:false).selectedHiveId=widget.hive.id;
+                            Provider.of<AppLogic>(context, listen: false)
+                                .selectedHiveId = widget.hive.id;
                             Navigator.of(context).pushReplacementNamed('visit');
                           },
                           child: Row(
-                            children: [Icon(Icons.visibility_rounded), Text('بازدید')],
+                            children: [
+                              Icon(Icons.visibility_rounded),
+                              Text('بازدید')
+                            ],
                           ),
                         )
                       ],
@@ -255,14 +260,19 @@ class HomeBottomNavigationBar extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                MaterialButton(
-                  shape: StadiumBorder(),
-                  color: Theme.of(context).colorScheme.background,
-                  elevation: 0,
-                  highlightElevation: 0,
-                  onPressed: () {},
-                  child: Text('جستجو'),
-                ),
+                Consumer<HomeScreenModel>(builder: (_, model, __) {
+                  return MaterialButton(
+                    shape: StadiumBorder(),
+                    color: Theme.of(context).colorScheme.background,
+                    elevation: 0,
+                    highlightElevation: 0,
+                    onPressed: () {
+                      Navigator.of(context).push(MaterialPageRoute(
+                          builder: (context) => SearchScreen(model: model)));
+                    },
+                    child: Text('جستجو'),
+                  );
+                }),
                 MaterialButton(
                   shape: StadiumBorder(),
                   color: Theme.of(context).colorScheme.background,
@@ -278,6 +288,111 @@ class HomeBottomNavigationBar extends StatelessWidget {
         ),
         VoiceCommandButton(),
       ],
+    );
+  }
+}
+
+class SearchScreen extends StatefulWidget {
+  const SearchScreen({Key key, this.model}) : super(key: key);
+  final HomeScreenModel model;
+  @override
+  _SearchScreenState createState() => _SearchScreenState();
+}
+
+class _SearchScreenState extends State<SearchScreen> {
+  TextEditingController searchController = TextEditingController();
+  Future searchFuture;
+  @override
+  void initState() {
+    searchController.addListener(() {
+      if (searchController.text.isEmpty) return;
+      setState(() {
+        searchFuture = widget.model.searchHives(searchController.text);
+      });
+    });
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SafeArea(
+      child: Scaffold(
+        body: Stack(
+          alignment: Alignment.center,
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(
+                  top: 60, bottom: 70, left: 10, right: 10),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  CustomTextField(
+                    widthInPercent: 0.7,
+                    hintText: 'جستجو',
+                    controller: searchController,
+                  ),
+                  SizedBox(
+                    height: 20,
+                  ),
+                  FutureBuilder(
+                      future: searchFuture,
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState == ConnectionState.waiting)
+                          return Center(
+                              child: SizedBox(
+                                  height: 60,
+                                  width: 60,
+                                  child: CircularProgressIndicator()));
+                        if (!snapshot.hasData)
+                          return Column(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Text(
+                                'هنوز چیزی برای نمایش وجود ندارد',
+                                textDirection: TextDirection.rtl,
+                                textAlign: TextAlign.center,
+                              ),
+                              SizedBox(
+                                height: 60,
+                              ),
+                              Text(
+                                'هر اطلاعات دلخواهی وارد کنید مانند شماره، توضیحات، عسل سالیانه و...',
+                                textDirection: TextDirection.rtl,
+                                textAlign: TextAlign.center,
+                              )
+                            ],
+                          );
+                        if (snapshot.hasError) print(snapshot.error);
+                        if (snapshot.hasData) {
+                          return Expanded(
+                            child: ListView.builder(
+                                itemCount: snapshot.data.length,
+                                itemBuilder: (context, index) {
+                                  return HomeHivesListItem(
+                                      hive: snapshot.data[index]);
+                                }),
+                          );
+                        }
+                        return Center(child: Text('خطا در بارگزاری'));
+                      })
+                ],
+              ),
+            ),
+            Align(
+              alignment: Alignment.bottomCenter,
+              child: BottomButtonSet(
+                onBackPressed: () {
+                  Navigator.of(context).pop();
+                },
+                rightAction: () {
+                  //TODO: open QR scanner
+                },
+                rightActionChild: Icon(Icons.qr_code),
+              ),
+            )
+          ],
+        ),
+      ),
     );
   }
 }

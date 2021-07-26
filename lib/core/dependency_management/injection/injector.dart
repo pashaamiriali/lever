@@ -51,4 +51,5 @@ class Injector {
 
   ChangeHiveQueenCmnd get getChangeHiveQueenCmnd =>
       ChangeHiveQueenCmnd(this._visitRepoImpl);
+  SearchHiveCmnd get getSearchHiveCmnd => SearchHiveCmnd(this._hiveRepoImpl);
 }

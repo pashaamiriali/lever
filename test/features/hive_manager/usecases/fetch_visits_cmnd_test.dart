@@ -1,7 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lever/features/hive_management/domain/data/hive_repo.dart';
 import 'package:lever/features/hive_management/domain/entities/entities.dart';
-import 'package:lever/features/hive_management/domain/usecases/fetch_hives_cmnd.dart';
 import 'package:lever/features/hive_management/domain/usecases/fetch_visits_cmnd.dart';
 import 'package:mockito/mockito.dart';
 

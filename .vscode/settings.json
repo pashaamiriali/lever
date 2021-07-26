@@ -3,6 +3,7 @@
         "Cmnd",
         "Jalali",
         "datetime",
+        "shamsi",
         "sqflite"
     ]
 }
