@@ -9,3 +9,4 @@ export 'fetch_hives_cmnd.dart';
 export 'harvest_hive_honey_cmnd.dart.dart';
 export 'regular_hive_visit_cmnd.dart';
 export 'fetch_visits_cmnd.dart';
+export 'search_hive_cmnd.dart';

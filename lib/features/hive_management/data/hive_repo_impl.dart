@@ -105,10 +105,77 @@ class HiveRepoImpl extends HiveRepo {
   fetchHive(String hiveId) async {
     return await _hiveFromHiveTable(await this._appDatabase.getHive(hiveId));
   }
+
   @override
   Future<List<Visit>> fetchVisits(String hiveId) async {
     return await getHiveVisits(hiveId);
   }
+
+  @override
+  Future<List<Hive>> searchHives(String query) async {
+    List<THive> allHives = await this._appDatabase.allHives;
+    List<Hive> matchingHives = [];
+    for (THive hive in allHives) {
+      if (_matchHiveWithQuery(query, hive, matchingHives)) {
+        matchingHives.add(await _hiveFromHiveTable(hive));
+        continue;
+      }
+      if (await _matchPopulationInfoWithQuery(query, hive, matchingHives)) {
+        matchingHives.add(await _hiveFromHiveTable(hive));
+        continue;
+      }
+      if (await _matchQueenInfoWithQuery(query, hive, matchingHives)) {
+        matchingHives.add(await _hiveFromHiveTable(hive));
+        continue;
+      }
+      if (await _matchVisitsWithQuery(query, hive, matchingHives)) {
+        matchingHives.add(await _hiveFromHiveTable(hive));
+        continue;
+      }
+    }
+    return matchingHives;
+  }
+
+  bool _matchHiveWithQuery(String query, THive hive, List<Hive> matchingHives) {
+    if (int.tryParse(query) != null) if (hive.number == int.parse(query))
+      return true;
+
+    if (hive.description.contains(query)) return true;
+    if (int.tryParse(query) != null) if (hive.annualHoney == int.parse(query))
+      return true;
+
+    return false;
+  }
+
+  Future<bool> _matchPopulationInfoWithQuery(
+      String query, THive hive, List<Hive> matchingHives) async {
+    TPopulationInfo populationInfo =
+        await this._appDatabase.getLastPopulationInfo(hive.id);
+    if (int.tryParse(query) != null) if (populationInfo.frames ==
+        int.parse(query)) return true;
+    if (int.tryParse(query) != null) if (populationInfo.stairs ==
+        int.parse(query)) return true;
+    if (populationInfo.status == query) return true;
+    return false;
+  }
+
+  Future<bool> _matchQueenInfoWithQuery(
+      String query, THive hive, List<Hive> matchingHives) async {
+    TQueenInfo queenInfo = await this._appDatabase.getLastQueenInfo(hive.id);
+    if (queenInfo.breed == query) return true;
+    return false;
+  }
+
+  Future<bool> _matchVisitsWithQuery(
+      String query, THive hive, List<Hive> matchingHives) async {
+    List<Visit> visits = await getHiveVisits(hive.id);
+    for (Visit visit in visits) {
+      if (visit.description.contains(query)) return true;
+      if (visit is RegularVisit) if (visit.behavior==query) return true;
+    }
+    return false;
+  }
+
   Hive _generateCompleteHive(
       hiveId,
       Hive hive,
@@ -220,9 +287,11 @@ class HiveRepoImpl extends HiveRepo {
 
   Future<List<Visit>> getHiveVisits(String hiveId) async {
     List<Visit> visits = [];
-    var _rawRegularVisits = await this._appDatabase.getHiveRegularVisits(hiveId);
+    var _rawRegularVisits =
+        await this._appDatabase.getHiveRegularVisits(hiveId);
     var _rawChangeQueens = await this._appDatabase.getHiveChangeQueens(hiveId);
-    var _rawHarvestHoneys = await this._appDatabase.getHiveHarvestHoneys(hiveId);
+    var _rawHarvestHoneys =
+        await this._appDatabase.getHiveHarvestHoneys(hiveId);
     for (TRegularVisit regularVisit in _rawRegularVisits)
       visits.add(RegularVisit(
           regularVisit.id,
@@ -288,6 +357,4 @@ class HiveRepoImpl extends HiveRepo {
         await getHiveQueenInfo(hive.id),
         await getHiveVisits(hive.id));
   }
-
-
 }

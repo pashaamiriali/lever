@@ -390,7 +390,8 @@ main() {
       HiveRepoImpl hiveRepoImpl =
           HiveRepoImpl(mockAppDatabase, mockIdGen, mockDateTimeProvider);
       var result = await hiveRepoImpl.fetchVisits(exampleHive.id);
-      expect(result.runtimeType, [exampleRegularVisit,exampleChangeQueen].runtimeType);
+      expect(result.runtimeType,
+          [exampleRegularVisit, exampleChangeQueen].runtimeType);
     });
   });
   group('deleteHive', () {
@@ -447,6 +448,153 @@ main() {
       await impl.editQueenInfo(QueenInfo('someId', null, null, null, null));
       expect(verify(mockAppDatabase.updateQueenInfo(captureAny)).captured[0],
           TypeMatcher<TQueenInfo>());
+    });
+  });
+  group('searchHives', () {
+    MockAppDatabase mockAppDatabase = MockAppDatabase();
+    MockIdGen mockIdGen = MockIdGen();
+    MockDateTimeProvider mockDateTimeProvider = MockDateTimeProvider();
+    when(mockDateTimeProvider.getCurrentDateTime()).thenReturn(DateTime.now());
+    THive exampleHiveRecord = THive(
+        id: 'someId123',
+        number: 1234,
+        annualHoney: 60,
+        description: 'some desc',
+        picture: 'aPicture.jpg');
+    TRegularVisit exampleRegularVisitRecord = TRegularVisit(
+        id: 'someId123',
+        hiveId: 'someId123',
+        date: mockDateTimeProvider.getCurrentDateTime(),
+        pictures: '[]',
+        description: 'some visit desc',
+        behavior: 'Calm',
+        queenSeen: true,
+        honeyMaking: 'Good');
+    THarvestHoney exampleHarvestHoneyRecord = THarvestHoney(
+        id: 'someId123',
+        hiveId: 'someId123',
+        date: mockDateTimeProvider.getCurrentDateTime(),
+        pictures: '[]',
+        description: 'some visit desc',
+        describedAmount: 'Good',
+        frames: 4,
+        quality: 'Good',
+        weight: 12);
+    TChangeQueen exampleChangeQueenRecord = TChangeQueen(
+        id: 'someId123',
+        hiveId: 'someId123',
+        date: mockDateTimeProvider.getCurrentDateTime(),
+        pictures: '[]',
+        description: 'some visit desc');
+    TPopulationInfo examplePopulationInfoRecord = TPopulationInfo(
+        id: 'someId123',
+        regularVisitId: 'someId123',
+        frames: 20,
+        stairs: 2,
+        status: 'Strong');
+    TQueenInfo exampleQueenInfoRecord = TQueenInfo(
+        id: 'someId123',
+        changeQueenId: 'someId123',
+        enterDate: mockDateTimeProvider.getCurrentDateTime(),
+        breed: 'Karnika',
+        backColor: 'Black');
+    when(mockAppDatabase.allHives)
+        .thenAnswer((realInvocation) async => [exampleHiveRecord]);
+    when(mockAppDatabase.getLastPopulationInfo(any))
+        .thenAnswer((realInvocation) async => examplePopulationInfoRecord);
+    when(mockAppDatabase.getLastQueenInfo(any))
+        .thenAnswer((realInvocation) async => exampleQueenInfoRecord);
+    when(mockAppDatabase.getHiveChangeQueens(any))
+        .thenAnswer((realInvocation) async => [exampleChangeQueenRecord]);
+    when(mockAppDatabase.getHiveRegularVisits(any))
+        .thenAnswer((realInvocation) async => [exampleRegularVisitRecord]);
+    when(mockAppDatabase.getHiveHarvestHoneys(any))
+        .thenAnswer((realInvocation) async => [exampleHarvestHoneyRecord]);
+    when(mockAppDatabase.getPopulationInfo(any))
+        .thenAnswer((realInvocation) async => examplePopulationInfoRecord);
+    when(mockAppDatabase.getQueenInfo(any))
+        .thenAnswer((realInvocation) async => exampleQueenInfoRecord);
+
+    test('should return nothing on a no-match query', () async {
+      String query = 'this is a no match query';
+      HiveRepoImpl repo =
+          HiveRepoImpl(mockAppDatabase, mockIdGen, mockDateTimeProvider);
+      var result = await repo.searchHives(query);
+      expect(result.length, 0);
+    });
+    group('should return matching hives', () {
+      test('should return matching number', () async {
+        String query = '1234';
+        HiveRepoImpl repo =
+            HiveRepoImpl(mockAppDatabase, mockIdGen, mockDateTimeProvider);
+        var result = await repo.searchHives(query);
+        expect(result[0].number.toString(), query);
+      });
+      test('should return matching description', () async {
+        String query = 'some';
+        HiveRepoImpl repo =
+            HiveRepoImpl(mockAppDatabase, mockIdGen, mockDateTimeProvider);
+        var result = await repo.searchHives(query);
+        expect(result[0].description.contains(query), true);
+      });
+      test('should return matching annual honey', () async {
+        String query = '60';
+        HiveRepoImpl repo =
+            HiveRepoImpl(mockAppDatabase, mockIdGen, mockDateTimeProvider);
+        var result = await repo.searchHives(query);
+        expect(result[0].annualHoney.toString(), query);
+      });
+    });
+    group('should return hives with matching populationInfo', () {
+      test('should return matching frames count', () async {
+        String query = '20';
+        HiveRepoImpl repo =
+            HiveRepoImpl(mockAppDatabase, mockIdGen, mockDateTimeProvider);
+        var result = await repo.searchHives(query);
+        expect(result[0].populationInfo.frames.toString(), query);
+      });
+      test('should return matching stairs count', () async {
+        String query = '2';
+        HiveRepoImpl repo =
+            HiveRepoImpl(mockAppDatabase, mockIdGen, mockDateTimeProvider);
+        var result = await repo.searchHives(query);
+        expect(result[0].populationInfo.stairs.toString(), query);
+      });
+      test('should return matching status', () async {
+        String query = 'Strong';
+        HiveRepoImpl repo =
+            HiveRepoImpl(mockAppDatabase, mockIdGen, mockDateTimeProvider);
+        var result = await repo.searchHives(query);
+        expect(result[0].populationInfo.status, query);
+      });
+    });
+    group('should return hives with matching queenInfo', (){
+      //TODO: Add matching date and color
+      test('should return matching breed', () async {
+        String query = 'Karnika';
+        HiveRepoImpl repo =
+        HiveRepoImpl(mockAppDatabase, mockIdGen, mockDateTimeProvider);
+        var result = await repo.searchHives(query);
+        expect(result[0].queenInfo.breed, query);
+      });
+    });
+    group('should return hives with matching visits',(){
+      test('should return matching description', () async {
+        String query = 'visit';
+        HiveRepoImpl repo =
+        HiveRepoImpl(mockAppDatabase, mockIdGen, mockDateTimeProvider);
+        var result = await repo.searchHives(query);
+        expect(result[0].visits[0].description.contains(query), true);
+      });
+      test('should return matching behavior', () async {
+        String query = 'Calm';
+        HiveRepoImpl repo =
+        HiveRepoImpl(mockAppDatabase, mockIdGen, mockDateTimeProvider);
+        var result = await repo.searchHives(query);
+        for(Visit visit in result[0].visits)
+          if(visit is RegularVisit)
+        expect(visit.behavior, query);
+      });
     });
   });
 }

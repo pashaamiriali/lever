@@ -10,4 +10,5 @@ abstract class HiveRepo {
   editHive(Hive hive);
   editPopulationInfo(PopulationInfo populationInfo);
   editQueenInfo(QueenInfo queenInfo);
+  searchHives(String query);
 }

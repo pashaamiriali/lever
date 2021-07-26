@@ -67,4 +67,5 @@ void main() {
           TypeMatcher<TQueenInfosCompanion>());
     });
   });
+
 }

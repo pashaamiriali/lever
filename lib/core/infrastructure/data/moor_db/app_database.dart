@@ -37,7 +37,6 @@ class AppDatabase extends _$AppDatabase {
 
   Future<List<THive>> get allHives => select(tHives).get();
 
-  //TODO: this should not provide for the history list
   Future<List<TRegularVisit>> getHiveRegularVisits(hiveId) async {
     return await (select(tRegularVisits)
           ..where((tbl) => tbl.hiveId.equals(hiveId)))
@@ -115,6 +114,7 @@ class AppDatabase extends _$AppDatabase {
   Future<int> addChangeQueen(TChangeQueensCompanion changeQueen) {
     return into(tChangeQueens).insert(changeQueen);
   }
+
   Future<int> addHarvestHoney(THarvestHoneysCompanion harvestHoney) {
     return into(tHarvestHoneys).insert(harvestHoney);
   }
