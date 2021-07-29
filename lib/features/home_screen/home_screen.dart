@@ -23,6 +23,7 @@ class _HomeScreenState extends State<HomeScreen> {
         _injector.getFetchHivesCmnd,
         _injector.getDeleteHiveCmnd,
         _injector.getSearchHiveCmnd,
+        _injector.getFetchHiveCmnd,
       ),
       child: Scaffold(
         body: Container(

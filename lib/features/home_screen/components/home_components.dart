@@ -1,9 +1,11 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:lever/core/components/global_view_components.dart';
+import 'package:lever/core/infrastructure/qr_provider/scan_qr_screen.dart';
 import 'package:lever/features/app/presentation/logic/app_view_logic.dart';
 import 'package:lever/features/hive_management/domain/entities/entities.dart';
 import 'package:lever/features/home_screen/logic/home_screen_model.dart';
@@ -304,8 +306,9 @@ class _SearchScreenState extends State<SearchScreen> {
   Future searchFuture;
   @override
   void initState() {
-    searchController.addListener(() {
+    searchController.addListener(() async {
       if (searchController.text.isEmpty) return;
+      await Future.delayed(Duration(seconds: 1));
       setState(() {
         searchFuture = widget.model.searchHives(searchController.text);
       });
@@ -384,8 +387,21 @@ class _SearchScreenState extends State<SearchScreen> {
                 onBackPressed: () {
                   Navigator.of(context).pop();
                 },
-                rightAction: () {
-                  //TODO: open QR scanner
+                rightAction: () async {
+                  var result = await scanQrCode();
+
+                  if (result.isEmpty) {
+                    showQRErrorDialog(context);
+                    return;
+                  }
+                  var hive = await widget.model.fetchHive(result);
+                  if (hive == null) {
+                    showQRErrorDialog(context);
+                    return;
+                  }
+                  Provider.of<AppLogic>(context, listen: false).selectedHiveId =
+                      result;
+                  Navigator.of(context).pushNamed('hiveDetails');
                 },
                 rightActionChild: Icon(Icons.qr_code),
               ),
@@ -394,5 +410,15 @@ class _SearchScreenState extends State<SearchScreen> {
         ),
       ),
     );
+  }
+
+  Future<dynamic> showQRErrorDialog(BuildContext context) {
+    return showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Text('خطا'),
+          );
+        });
   }
 }

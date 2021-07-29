@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:lever/features/hive_management/domain/entities/entities.dart';
 import 'package:lever/features/hive_management/domain/usecases/delete_hive_cmnd.dart';
+import 'package:lever/features/hive_management/domain/usecases/fetch_hive_cmnd.dart';
 import 'package:lever/features/hive_management/domain/usecases/fetch_hives_cmnd.dart';
 import 'package:lever/features/hive_management/domain/usecases/search_hive_cmnd.dart';
 
@@ -8,8 +9,13 @@ class HomeScreenModel with ChangeNotifier {
   final FetchHivesCmnd _fetchHivesCmnd;
   final DeleteHiveCmnd _deleteHiveCmnd;
   final SearchHiveCmnd _searchHiveCmnd;
+  final FetchHiveCmnd _fetchHiveCmnd;
   HomeScreenModel(
-      this._fetchHivesCmnd, this._deleteHiveCmnd, this._searchHiveCmnd);
+    this._fetchHivesCmnd,
+    this._deleteHiveCmnd,
+    this._searchHiveCmnd,
+    this._fetchHiveCmnd,
+  );
 
   List<Hive> _hives;
 
@@ -27,7 +33,15 @@ class HomeScreenModel with ChangeNotifier {
 
   Future<List<Hive>> searchHives(String query) async {
     if (query.isEmpty) return null;
-    await Future.delayed(Duration(seconds: 1));
     return await this._searchHiveCmnd.execute({'query': query});
+  }
+
+  Future<Hive> fetchHive(String hiveId) async {
+    if (hiveId.isEmpty) return null;
+    try {
+      return await this._fetchHiveCmnd.execute({'hive_id': hiveId});
+    } catch (e) {
+      return null;
+    }
   }
 }

@@ -36,9 +36,9 @@ class HiveRepoImpl extends HiveRepo {
       return null;
     }
   }
-
+  
   @override
-  Future<void> saveHive(
+  Future<String> saveHive(
       Hive hive, PopulationInfo populationInfo, QueenInfo queenInfo) async {
     var hiveId = this._idGen.generateId();
     var regularVisitId = this._idGen.generateId();
@@ -58,6 +58,7 @@ class HiveRepoImpl extends HiveRepo {
     await _addPopulationInfoForHive(
         populationInfoId, regularVisitId, populationInfo);
     await _addQueenInfoForHive(queenInfoId, changeQueenId, queenInfo);
+    return hiveId;
   }
 
   @override
@@ -171,7 +172,7 @@ class HiveRepoImpl extends HiveRepo {
     List<Visit> visits = await getHiveVisits(hive.id);
     for (Visit visit in visits) {
       if (visit.description.contains(query)) return true;
-      if (visit is RegularVisit) if (visit.behavior==query) return true;
+      if (visit is RegularVisit) if (visit.behavior == query) return true;
     }
     return false;
   }

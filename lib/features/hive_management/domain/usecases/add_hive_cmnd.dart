@@ -10,7 +10,7 @@ class AddHiveCmnd extends Command {
 
 //map: {'hive': hive, 'population_info': populationInfo, 'queen_info': queenInfo}
   @override
-  Future<Hive> execute(Map<String, dynamic> args) async {
+  Future<String> execute(Map<String, dynamic> args) async {
     if (args.length != 3 ||
         args['hive'] == null ||
         args['population_info'] == null ||

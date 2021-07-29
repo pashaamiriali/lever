@@ -6,6 +6,7 @@ import 'package:lever/core/components/global_view_components.dart';
 import 'package:lever/core/dependency_management/injection/InjectorProvider.dart';
 import 'package:lever/core/dependency_management/injection/injector.dart';
 import 'package:lever/core/infrastructure/camera/take_picture_screen.dart';
+import 'package:lever/core/infrastructure/qr_provider/save_qr.dart';
 import 'package:lever/features/app/presentation/logic/app_view_logic.dart';
 import 'package:lever/features/hive_management/domain/entities/entities.dart';
 import 'package:lever/features/hive_management/presentation/components/hive_view_components.dart';
@@ -442,8 +443,45 @@ class _HiveDetailScreenState extends State<HiveDetailScreen> {
           child: MaterialButton(
             color: Theme.of(context).colorScheme.primary,
             textColor: Theme.of(context).colorScheme.onPrimary,
-            onPressed: () {
-              //TODO: show QR code dialog + save to gallery functionality
+            onPressed: () async {
+              await saveQrCode(hive.id, hive.number.toString());
+              showDialog(
+                  context: context,
+                  builder: (context) => AlertDialog(
+                        scrollable: true,
+                        title: Text(
+                          'ذخیره شد',
+                          textAlign: TextAlign.right,
+                          textDirection: TextDirection.rtl,
+                        ),
+                        content: Center(
+                          child: Column(
+                            children: [
+                              Text(
+                                'کد QR کندو در گالری ذخیره شد. لطفا بعد از پرینت کردن آن را روی کندو بچسبانید تا برای دسترسی راحت تر اسکن کنید',
+                                textAlign: TextAlign.right,
+                                textDirection: TextDirection.rtl,
+                              ),
+                              Text(
+                                'لطفا شماره کندو(' +
+                                    hive.number.toString() +
+                                    ') را روی کندو بنویسید تا فراموش نشود',
+                                textAlign: TextAlign.right,
+                                textDirection: TextDirection.rtl,
+                              )
+                            ],
+                          ),
+                        ),
+                        actions: [
+                          MaterialButton(
+                            onPressed: () {
+                              Navigator.of(context).pushReplacementNamed('/');
+                            },
+                            child: Text('تایید'),
+                          )
+                        ],
+                      ),
+                  barrierDismissible: false);
             },
             shape: StadiumBorder(),
             child: Text('QR'),
