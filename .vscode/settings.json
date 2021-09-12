@@ -6,5 +6,6 @@
         "gapless",
         "shamsi",
         "sqflite"
-    ]
+    ],
+    "terminal.integrated.defaultProfile.windows": "Git Bash"
 }

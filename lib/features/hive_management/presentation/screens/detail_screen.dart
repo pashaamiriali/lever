@@ -701,7 +701,7 @@ class EditDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     return AlertDialog(
       title: Text('ویرایش'),
-      content: content,
+      content: Container(height: 350, child: content),
       scrollable: true,
       actions: [
         CancelButton(
